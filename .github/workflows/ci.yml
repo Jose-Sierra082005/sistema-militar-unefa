@@ -1,0 +1,81 @@
+# ==============================================================================
+#  CI/CD Pipeline — Sistema Web de Formación Militar
+#  GitHub Actions Workflow: Integración Continua (CI)
+#
+#  Disparado automáticamente en cada Pull Request hacia 'main' o 'develop'.
+#  Pasos: 1) Checkout → 2) Setup PHP → 3) Configurar entorno →
+#          4) Instalar dependencias → 5) Ejecutar pruebas base
+# ==============================================================================
+
+name: 🎖️ CI — Verificación y Pruebas Automáticas
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  push:
+    branches:
+      - develop
+
+jobs:
+  laravel-tests:
+    name: Verificación del Proyecto Laravel (PHP ${{ matrix.php-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.4']
+
+    steps:
+      # ─── PASO 1: Descargar el código del repositorio ─────────────────────────
+      - name: "📥 Paso 1 — Descargar código fuente"
+        uses: actions/checkout@v4
+
+      # ─── PASO 2: Configurar PHP con las extensiones necesarias para Laravel ──
+      - name: "⚙️ Paso 2 — Configurar PHP ${{ matrix.php-version }}"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, pdo, pdo_mysql, pdo_sqlite, sqlite3, xml, curl, bcmath, json, tokenizer, openssl
+          coverage: none
+          tools: composer:v2
+
+      # ─── PASO 3: Configurar el entorno de la aplicación ──────────────────────
+      - name: "📋 Paso 3 — Configurar variables de entorno (.env)"
+        run: |
+          cp .env.example .env
+          # Sobrescribir para usar SQLite en el entorno de CI (sin Aiven)
+          sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=sqlite/' .env
+          sed -i 's/DB_HOST=.*/# DB_HOST=/' .env
+          sed -i 's/DB_PORT=.*/# DB_PORT=/' .env
+          sed -i 's/DB_DATABASE=.*/DB_DATABASE=:memory:/' .env
+          sed -i 's/DB_USERNAME=.*/# DB_USERNAME=/' .env
+          sed -i 's/DB_PASSWORD=.*/# DB_PASSWORD=/' .env
+
+      # ─── PASO 4: Instalar dependencias con Composer ───────────────────────────
+      - name: "📦 Paso 4 — Instalar dependencias de Composer"
+        uses: ramsey/composer-install@v3
+        with:
+          composer-options: "--prefer-dist --optimize-autoloader --no-progress"
+
+      # ─── Generar la clave de la aplicación y preparar la base de datos ────────
+      - name: "🔑 Generar clave de aplicación"
+        run: php artisan key:generate --force
+
+      - name: "🗄️ Crear base de datos SQLite en memoria para las pruebas"
+        run: |
+          touch database/database.sqlite
+
+      - name: "📊 Ejecutar migraciones en entorno de CI"
+        run: php artisan migrate --force
+
+      # ─── PASO 5: Ejecutar la suite de pruebas base de Laravel ────────────────
+      - name: "🧪 Paso 5 — Ejecutar pruebas automáticas (php artisan test)"
+        run: php artisan test --colors=always
+
+      # ─── PASO EXTRA: Verificación de estilo de código con Laravel Pint ───────
+      - name: "🎨 Verificar estilo de código (Laravel Pint — Linter)"
+        run: ./vendor/bin/pint --test
+        continue-on-error: true
