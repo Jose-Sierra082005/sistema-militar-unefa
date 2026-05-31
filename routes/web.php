@@ -1,5 +1,7 @@
 <?php
 
+// Cambio demostrativo para el video del Avance 3
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
