@@ -1,16 +1,13 @@
 # ==============================================================================
 #  Render Blueprint Specification — Sistema Militar UNEFA
-#  Infraestructura como Código (IaC) para Despliegue Automático
+#  Despliegue Profesional mediante Contenedor Docker (PHP 8.4 + Apache)
 # ==============================================================================
 
 services:
   - type: web
     name: sistema-militar-unefa
-    env: php
+    env: docker
     plan: free
-    buildCommand: |
-      composer install --no-dev --optimize-autoloader
-    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
     envVars:
       - key: APP_ENV
         value: production
