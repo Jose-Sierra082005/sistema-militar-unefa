@@ -1,6 +1,6 @@
 # ==============================================================================
-#  Render Blueprint Specification — Sistema Militar UNEFA
-#  Despliegue Profesional mediante Contenedor Docker (PHP 8.4 + Apache)
+#  Render Blueprint — Sistema Militar UNEFA
+#  Despliegue via contenedor Docker (PHP 8.4 + Apache + Laravel)
 # ==============================================================================
 
 services:
@@ -8,16 +8,29 @@ services:
     name: sistema-militar-unefa
     env: docker
     plan: free
+    # Render construye la imagen desde el Dockerfile en la raíz del repositorio
+    dockerfilePath: ./Dockerfile
+    branch: main
     envVars:
+      - key: APP_NAME
+        value: "Sistema Militar UNEFA"
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: "false"
       - key: APP_KEY
-        value: base64:t28xTzZ0OHlMZWNoMDh5Tzh5YjNhY2o3eW1xNHBnOHc= # Clave base64 autogenerada para producción
+        value: base64:t28xTzZ0OHlMZWNoMDh5Tzh5YjNhY2o3eW1xNHBnOHc=
+      - key: APP_URL
+        value: https://sistema-militar-unefa.onrender.com
       - key: DB_CONNECTION
         value: sqlite
       - key: DB_DATABASE
-        value: ":memory:"
-      - key: APP_URL
-        value: https://sistema-militar-unefa.onrender.com
+        value: /var/www/html/database/database.sqlite
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: error
+      - key: SESSION_DRIVER
+        value: cookie
+      - key: CACHE_STORE
+        value: array
