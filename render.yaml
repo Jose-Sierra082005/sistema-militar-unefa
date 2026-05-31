@@ -17,7 +17,7 @@ services:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
-        value: "false"
+        value: "true"
       - key: APP_KEY
         value: base64:t28xTzZ0OHlMZWNoMDh5Tzh5YjNhY2o3eW1xNHBnOHc=
       - key: APP_URL
@@ -29,7 +29,7 @@ services:
       - key: LOG_CHANNEL
         value: stderr
       - key: LOG_LEVEL
-        value: error
+        value: debug
       - key: SESSION_DRIVER
         value: cookie
       - key: CACHE_STORE
