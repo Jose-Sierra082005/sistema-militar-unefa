@@ -29,6 +29,7 @@ Thumbs.db
 # ===== PROJECT DOCUMENTATION (Avance 2 assets - not part of deployed code) =====
 # Keep these files locally but do not commit them to the main codebase repo.
 # They are academic documents submitted separately.
+/documentos_proyecto/
 *.pdf
 *.docx
 *_backup.docx
