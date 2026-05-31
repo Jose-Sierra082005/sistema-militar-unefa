@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 #  Dockerfile para Despliegue de Laravel en Render.com
 #  PHP 8.4 + Apache ÔÇö Optimizado para producci├│n
 # ==============================================================================
@@ -71,12 +71,11 @@ RUN php artisan key:generate --force \
     && php artisan route:cache \
     && php artisan view:cache
 
+
 # 12. Permisos correctos para Apache
 RUN mkdir -p storage/framework/{cache,sessions,views} \
-    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-
-# 13. Exponer puerto 80
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
 EXPOSE 80
 
 # 14. Al arrancar: crear SQLite, migrar, recargar config y lanzar Apache
