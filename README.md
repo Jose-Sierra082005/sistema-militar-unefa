@@ -29,7 +29,7 @@ Plataforma educativa tipo LMS (Learning Management System) desarrollada con el f
 | José Sierra | C.I: 31.149.881 | Coordinador General y Desarrollador Principal (Laravel/Backend) |
 | José Salcedo | C.I: 31.559.727 | Analista, Documentador y Diseñador de Interfaz (UI/UX) |
 
-**Tutor Académico:** MSC. Robert González
+**Docente de la Asignatura:** MSC. Robert González
 
 ---
 
