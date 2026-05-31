@@ -1,13 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Ruta temporal para demostración del login
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+// Rutas de demostración del login para el pipeline CI/CD en Render
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+
 

@@ -247,11 +247,24 @@
             <p class="subtitle">Portal de Formación y Evaluaciones Académicas <br> UNEFA Falcón</p>
         </div>
 
-        <form action="#" method="POST" onsubmit="event.preventDefault();">
+        @if ($errors->any())
+            <div style="background: rgba(255, 92, 92, 0.15); border: 1px solid var(--error-color); color: var(--error-color); padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem; text-align: center; line-height: 1.4;">
+                <i class="fa-solid fa-circle-exclamation" style="margin-right: 5px;"></i> {{ $errors->first() }}
+            </div>
+        @endif
+
+        @if (session('success'))
+            <div style="background: rgba(46, 74, 53, 0.2); border: 1px solid var(--primary-green); color: var(--accent-gold); padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem; text-align: center; line-height: 1.4;">
+                <i class="fa-solid fa-circle-check" style="margin-right: 5px;"></i> {{ session('success') }}
+            </div>
+        @endif
+
+        <form action="{{ route('login') }}" method="POST">
+            @csrf
             <div class="form-group">
                 <label class="form-label">Cédula o Correo Electrónico</label>
                 <div class="input-wrapper">
-                    <input type="text" class="form-input" placeholder="ej. 31.149.881 o estudiante@unefa.ve" required>
+                    <input type="text" name="email" class="form-input" placeholder="ej. 31.149.881 o estudiante@unefa.ve" value="{{ old('email') }}" required>
                     <i class="fa-solid fa-user input-icon"></i>
                 </div>
             </div>
@@ -259,14 +272,14 @@
             <div class="form-group">
                 <label class="form-label">Contraseña</label>
                 <div class="input-wrapper">
-                    <input type="password" class="form-input" placeholder="••••••••" required>
+                    <input type="password" name="password" class="form-input" placeholder="••••••••" required>
                     <i class="fa-solid fa-lock input-icon"></i>
                 </div>
             </div>
 
             <div class="form-options">
                 <label class="remember-me">
-                    <input type="checkbox"> Recordarme
+                    <input type="checkbox" name="remember"> Recordarme
                 </label>
                 <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
             </div>
