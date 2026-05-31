@@ -1,0 +1,26 @@
+# ==============================================================================
+#  Render Blueprint Specification — Sistema Militar UNEFA
+#  Infraestructura como Código (IaC) para Despliegue Automático
+# ==============================================================================
+
+services:
+  - type: web
+    name: sistema-militar-unefa
+    env: php
+    plan: free
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader
+    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        value: base64:t28xTzZ0OHlMZWNoMDh5Tzh5YjNhY2o3eW1xNHBnOHc= # Clave base64 autogenerada para producción
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: ":memory:"
+      - key: APP_URL
+        value: https://sistema-militar-unefa.onrender.com
