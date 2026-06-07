@@ -13,6 +13,18 @@ Route::get('/', function () {
 // Ruta de cierre de sesión
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Rutas de Registro de Oficiales
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+
+// Rutas de Configuración del Doble Factor (2FA)
+Route::get('/two-factor/setup', [AuthController::class, 'showTwoFactorSetup'])->name('two-factor.setup');
+Route::post('/two-factor/activate', [AuthController::class, 'activateTwoFactor'])->name('two-factor.activate');
+
+// Rutas de Verificación del Doble Factor (2FA)
+Route::get('/two-factor/verify', [AuthController::class, 'showTwoFactorVerify'])->name('two-factor.verify');
+Route::post('/two-factor/verify', [AuthController::class, 'verifyTwoFactor']);
+
 // Rutas de demostración del login para el pipeline CI/CD en Render
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Seguro - Sistema Militar UNEFA</title>
+    <title>Registro de Oficial - Sistema Militar UNEFA</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,7 +70,6 @@
             z-index: 1;
         }
 
-        /* Abstract Radar scan sweep line animation */
         .radar-sweep {
             position: absolute;
             top: 0;
@@ -90,7 +89,7 @@
 
         .login-card {
             width: 100%;
-            max-width: 460px;
+            max-width: 500px;
             background: var(--panel-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -133,7 +132,6 @@
         .cb-bl { bottom: 15px; left: 15px; border-width: 0 0 2px 2px; }
         .cb-br { bottom: 15px; right: 15px; border-width: 0 2px 2px 0; }
 
-        /* Security encrypted connection badge */
         .security-badge {
             display: inline-flex;
             align-items: center;
@@ -149,17 +147,6 @@
             margin-bottom: 25px;
             font-family: 'Share Tech Mono', monospace;
             box-shadow: 0 0 10px rgba(42, 71, 51, 0.2);
-        }
-
-        .security-badge i {
-            font-size: 0.65rem;
-            animation: pulse 1.8s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.4; }
-            50% { opacity: 1; }
-            100% { opacity: 0.4; }
         }
 
         .header {
@@ -179,24 +166,7 @@
             margin: 0 auto 15px auto;
             font-size: 2rem;
             color: var(--accent-gold);
-            box-shadow: 
-                0 0 15px rgba(212, 175, 55, 0.2),
-                inset 0 0 10px rgba(212, 175, 55, 0.1);
             position: relative;
-        }
-
-        .logo-container::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 1px dashed rgba(212, 175, 55, 0.4);
-            animation: rotate 20s linear infinite;
-        }
-
-        @keyframes rotate {
-            100% { transform: rotate(360deg); }
         }
 
         .title {
@@ -271,45 +241,6 @@
             color: var(--accent-gold);
         }
 
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
-            margin-bottom: 22px;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            color: var(--text-secondary);
-            user-select: none;
-            transition: color 0.2s ease;
-        }
-
-        .remember-me:hover {
-            color: var(--text-main);
-        }
-
-        .remember-me input {
-            margin-right: 8px;
-            accent-color: var(--accent-gold);
-            cursor: pointer;
-        }
-
-        .forgot-link {
-            color: var(--accent-gold);
-            text-decoration: none;
-            transition: color 0.2s ease, text-shadow 0.2s ease;
-        }
-
-        .forgot-link:hover {
-            color: var(--accent-gold-hover);
-            text-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
-            text-decoration: underline;
-        }
-
         .btn-submit {
             width: 100%;
             background: linear-gradient(135deg, var(--tactical-green), #1b2f21);
@@ -329,21 +260,6 @@
             overflow: hidden;
         }
 
-        .btn-submit::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-            transition: 0.5s;
-        }
-
-        .btn-submit:hover::before {
-            left: 100%;
-        }
-
         .btn-submit:hover {
             border-color: var(--accent-gold);
             box-shadow: 
@@ -351,76 +267,17 @@
                 0 0 10px rgba(212, 175, 55, 0.1);
         }
 
-        .btn-submit:active {
-            transform: translateY(1px);
-        }
-
-        /* Divider */
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            margin: 20px 0;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-family: 'Share Tech Mono', monospace;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .divider:not(:empty)::before {
-            margin-right: 15px;
-        }
-
-        .divider:not(:empty)::after {
-            margin-left: 15px;
-        }
-
-        /* Google Sign-in Button */
-        .btn-google {
-            width: 100%;
-            background-color: #ffffff;
-            color: #1f2937;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            cursor: pointer;
+        .forgot-link {
+            color: var(--accent-gold);
             text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            transition: color 0.2s ease;
         }
 
-        .btn-google:hover {
-            background-color: #f9fafb;
-            border-color: #d1d5db;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transform: translateY(-1px);
+        .forgot-link:hover {
+            color: var(--accent-gold-hover);
+            text-decoration: underline;
         }
 
-        .btn-google:active {
-            transform: translateY(0);
-        }
-
-        .google-icon {
-            width: 20px;
-            height: 20px;
-            display: block;
-        }
-
-        /* Status messages styling */
         .alert {
             padding: 14px 16px;
             border-radius: 8px;
@@ -439,12 +296,6 @@
             color: #ff9999;
         }
 
-        .alert-success {
-            background: rgba(46, 204, 113, 0.1);
-            border: 1px solid var(--success-green);
-            color: #9fedc0;
-        }
-
         .footer {
             margin-top: 35px;
             text-align: center;
@@ -454,23 +305,6 @@
             padding-top: 20px;
             line-height: 1.6;
         }
-
-        .footer a {
-            color: var(--accent-gold);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .footer a:hover {
-            color: var(--accent-gold-hover);
-            text-decoration: underline;
-        }
-
-        @media (max-width: 480px) {
-            .login-card {
-                padding: 35px 25px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -478,7 +312,6 @@
     <div class="radar-sweep"></div>
 
     <div class="login-card">
-        <!-- Tactical borders -->
         <div class="corner-border cb-tl"></div>
         <div class="corner-border cb-tr"></div>
         <div class="corner-border cb-bl"></div>
@@ -486,83 +319,87 @@
 
         <div style="text-align: center;">
             <div class="security-badge">
-                <i class="fa-solid fa-circle-dot"></i> Conexión Cifrada SSL
+                <i class="fa-solid fa-circle-dot"></i> Registro de Oficial
             </div>
         </div>
 
         <div class="header">
             <div class="logo-container">
-                <i class="fa-solid fa-shield-halved"></i>
+                <i class="fa-solid fa-user-plus"></i>
             </div>
-            <h2 class="title">Sistema Militar</h2>
-            <p class="subtitle">Portal de Formación y Evaluaciones Académicas <br> UNEFA Falcón</p>
+            <h2 class="title">Alta de Oficial</h2>
+            <p class="subtitle">Ingrese sus credenciales de registro para el Sistema Militar UNEFA</p>
         </div>
 
         @if ($errors->any())
             <div class="alert alert-danger">
                 <i class="fa-solid fa-circle-exclamation"></i>
-                <span>{{ $errors->first() }}</span>
+                <div style="display: flex; flex-direction: column;">
+                    @foreach ($errors->all() as $error)
+                        <span>{{ $error }}</span>
+                    @endforeach
+                </div>
             </div>
         @endif
 
-        @if (session('success'))
-            <div class="alert alert-success">
-                <i class="fa-solid fa-circle-check"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
-
-        <form action="{{ route('login') }}" method="POST">
+        <form action="{{ route('register') }}" method="POST">
             @csrf
+            
             <div class="form-group">
-                <label class="form-label">Cédula o Correo Electrónico</label>
+                <label class="form-label">Nombre Completo</label>
                 <div class="input-wrapper">
-                    <input type="text" name="email" class="form-input" placeholder="ej. 31.149.881 o estudiante@unefa.ve" value="{{ old('email') }}" required>
-                    <i class="fa-solid fa-user input-icon"></i>
+                    <input type="text" name="name" class="form-input" placeholder="ej. Capitán José Sierra" value="{{ old('name') }}" required>
+                    <i class="fa-solid fa-user-tie input-icon"></i>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Contraseña</label>
+                <label class="form-label">Cédula de Identidad</label>
+                <div class="input-wrapper">
+                    <input type="text" name="cedula" class="form-input" placeholder="ej. V-31149881 o 31149881" value="{{ old('cedula') }}" required>
+                    <i class="fa-solid fa-id-card input-icon"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Correo Electrónico</label>
+                <div class="input-wrapper">
+                    <input type="email" name="email" class="form-input" placeholder="ej. oficial@unefa.edu.ve" value="{{ old('email') }}" required>
+                    <i class="fa-solid fa-envelope input-icon"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Contraseña de Seguridad</label>
                 <div class="input-wrapper">
                     <input type="password" name="password" class="form-input" placeholder="••••••••" required>
                     <i class="fa-solid fa-lock input-icon"></i>
                 </div>
+                <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 5px; line-height: 1.3;">
+                    Debe incluir al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial (ej. @, $, !, %, *, ?, &).
+                </div>
             </div>
 
-            <div class="form-options">
-                <label class="remember-me">
-                    <input type="checkbox" name="remember"> Recordarme
-                </label>
-                <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+            <div class="form-group">
+                <label class="form-label">Confirmar Contraseña</label>
+                <div class="input-wrapper">
+                    <input type="password" name="password_confirmation" class="form-input" placeholder="••••••••" required>
+                    <i class="fa-solid fa-shield-halved input-icon"></i>
+                </div>
             </div>
 
             <button type="submit" class="btn-submit">
-                Ingresar al Sistema
+                Continuar a Doble Factor (2FA)
             </button>
         </form>
 
-        <div class="divider">Ó</div>
-
-        <!-- Google Login Integration Button -->
-        <a href="{{ route('auth.google') }}" class="btn-google">
-            <svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
-            </svg>
-            <span>Acceder con Google</span>
-        </a>
-
         <div style="text-align: center; margin-top: 25px; font-size: 0.9rem;">
-            <span style="color: var(--text-secondary);">¿No tienes una cuenta?</span>
-            <a href="{{ route('register') }}" class="forgot-link" style="margin-left: 5px; font-weight: 600;">Registrar Oficial</a>
+            <span style="color: var(--text-secondary);">¿Ya tienes una cuenta?</span>
+            <a href="{{ route('login') }}" class="forgot-link" style="margin-left: 5px; font-weight: 600;">Ingresar</a>
         </div>
 
         <div class="footer">
             <p>&copy; 2026 Sistema Militar UNEFA. Todos los derechos reservados.</p>
-            <p>Soporte Técnico: <a href="mailto:soporte@unefafalcon.edu.ve">soporte@unefafalcon.edu.ve</a></p>
         </div>
     </div>
 
