@@ -34,3 +34,15 @@ services:
         value: cookie
       - key: CACHE_STORE
         value: array
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: FILESYSTEM_DISK
+        value: local
+      # -----------------------------------------------------------------------
+      # IMPORTANTE: Las siguientes variables DEBEN configurarse manualmente
+      # en el Dashboard de Render → Environment → Environment Variables.
+      # NO las agregues aquí para evitar exponer secretos en el repositorio.
+      # -----------------------------------------------------------------------
+      # GOOGLE_CLIENT_ID      → Tu Client ID de Google OAuth
+      # GOOGLE_CLIENT_SECRET  → Tu Client Secret de Google OAuth
+      # GOOGLE_REDIRECT_URI   → https://sistema-militar-unefa.onrender.com/auth/google/callback
