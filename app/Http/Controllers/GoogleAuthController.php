@@ -66,6 +66,16 @@ class GoogleAuthController extends Controller
                 }
             }
 
+            // Check if user has Two-Factor Authentication enabled
+            if ($user->two_factor_enabled && !empty($user->two_factor_secret)) {
+                session([
+                    'auth.2fa.user_id' => $user->id,
+                    'auth.2fa.remember' => true
+                ]);
+
+                return redirect()->route('two-factor.verify')->with('info', 'Autenticación de Doble Factor requerida.');
+            }
+
             // Log the user in
             Auth::login($user, true);
 
