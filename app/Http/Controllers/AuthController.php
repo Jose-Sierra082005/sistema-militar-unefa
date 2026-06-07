@@ -237,4 +237,77 @@ class AuthController extends Controller
 
         return back()->withErrors(['code' => 'El código de seguridad es inválido o ha expirado.']);
     }
+
+    public function updateSecurityProfile(Request $request)
+    {
+        $user = Auth::user();
+        
+        $rules = [];
+        $messages = [];
+        
+        // If cedula is not set yet, require it
+        if (empty($user->cedula)) {
+            $cedula = strip_tags(trim($request->cedula));
+            $cleanCedula = str_replace(['.', '-', ' '], '', $cedula);
+            $request->merge(['cedula' => $cleanCedula]);
+            
+            $rules['cedula'] = 'required|string|unique:users,cedula,' . $user->id;
+            $messages['cedula.required'] = 'La Cédula de Identidad es obligatoria.';
+            $messages['cedula.unique'] = 'Esta Cédula ya está registrada en el sistema.';
+        }
+        
+        // If a password change is requested
+        if ($request->filled('password')) {
+            $rules['password'] = [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+            ];
+            $messages['password.min'] = 'La contraseña debe tener al menos :min caracteres.';
+            $messages['password.confirmed'] = 'La confirmación de la contraseña no coincide.';
+            $messages['password.regex'] = 'La clave debe incluir al menos una letra mayúscula, una letra minúscula, un número y un carácter especial (@, $, !, %, *, ?, &).';
+        }
+        
+        $request->validate($rules, $messages);
+        
+        $updateData = [];
+        if (empty($user->cedula)) {
+            $updateData['cedula'] = $request->cedula;
+        }
+        if ($request->filled('password')) {
+            $updateData['password'] = Hash::make($request->password);
+        }
+        
+        if (!empty($updateData)) {
+            $user->update($updateData);
+        }
+        
+        return back()->with('success', 'Perfil de seguridad actualizado correctamente.');
+    }
+
+    public function activateTwoFactorFromDashboard(Request $request)
+    {
+        $request->validate([
+            'secret' => 'required|string',
+            'code' => 'required|string|size:6',
+        ]);
+
+        $user = Auth::user();
+
+        // Verify the code input
+        $isValid = Google2FAService::verifyCode($request->secret, $request->code);
+
+        if ($isValid) {
+            $user->update([
+                'two_factor_secret' => $request->secret,
+                'two_factor_enabled' => true,
+            ]);
+
+            return back()->with('success', '¡Autenticación de Doble Factor (2FA) activada con éxito!');
+        }
+
+        return back()->withErrors(['code' => 'Código de verificación incorrecto. Inténtelo de nuevo.']);
+    }
 }

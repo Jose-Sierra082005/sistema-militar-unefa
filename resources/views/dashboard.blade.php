@@ -341,6 +341,18 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
+        .alert-warning {
+            background: rgba(212, 175, 55, 0.12) !important;
+            border: 1px solid var(--accent-gold) !important;
+            color: var(--accent-gold-hover) !important;
+        }
+
+        .alert-danger {
+            background: rgba(255, 77, 77, 0.12) !important;
+            border: 1px solid var(--error-red) !important;
+            color: #ff9999 !important;
+        }
+
         /* Welcome Banner Card */
         .welcome-card {
             background: linear-gradient(135deg, rgba(13, 20, 32, 0.9) 0%, rgba(8, 11, 19, 0.95) 100%);
@@ -891,6 +903,17 @@
                 </div>
             @endif
 
+            <!-- Alerta de Seguridad por perfil incompleto -->
+            @if(empty(auth()->user()->cedula) || !auth()->user()->two_factor_enabled)
+                <div class="alert alert-warning" style="margin-bottom: 20px;">
+                    <i class="fa-solid fa-shield-halved" style="font-size: 1.4rem;"></i>
+                    <div>
+                        <strong>ALERTA DE SEGURIDAD GENERAL:</strong> Su perfil se encuentra incompleto o sin doble factor de autenticación activo. 
+                        Para cumplir el protocolo militar, complete su <a href="#seccion-seguridad" style="color: var(--accent-gold-hover); font-weight: 700; text-decoration: underline;">configuración de seguridad</a> obligatoria al final de la página.
+                    </div>
+                </div>
+            @endif
+
             <!-- Welcome Tactical Header -->
             <div class="welcome-card">
                 <div class="welcome-card-content">
@@ -1094,6 +1117,109 @@
 
                 </div>
 
+            </div>
+
+            <!-- Panel de Seguridad (Obligatorio para Perfiles Incompletos) -->
+            <div class="panel" style="margin-top: 32px;" id="seccion-seguridad">
+                <div class="panel-header-bar">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-user-lock"></i>
+                        <span>Ajustes de Seguridad y Doble Factor (2FA)</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger" style="margin-bottom: 20px;">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span>{{ $errors->first() }}</span>
+                        </div>
+                    @endif
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px;">
+                        
+                        <!-- Formulario de Datos Básicos -->
+                        <div>
+                            <h3 style="color: var(--accent-gold); font-size: 1.1rem; margin-bottom: 15px; font-family: 'Share Tech Mono', monospace; text-transform: uppercase;">
+                                <i class="fa-solid fa-id-card" style="margin-right: 8px;"></i>Datos del Perfil
+                            </h3>
+                            <form action="{{ route('security.update') }}" method="POST">
+                                @csrf
+                                <div style="margin-bottom: 15px;">
+                                    <label class="form-label" style="text-align: left; margin-bottom: 6px;">Cédula de Identidad</label>
+                                    @if(empty(auth()->user()->cedula))
+                                        <input type="text" name="cedula" class="form-input" placeholder="ej. V-31149881 o 31149881" required style="padding-left: 15px;">
+                                        <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 5px;">Requerida para validez oficial del sistema militar.</span>
+                                    @else
+                                        <input type="text" class="form-input" value="{{ auth()->user()->cedula }}" disabled style="padding-left: 15px; opacity: 0.6; cursor: not-allowed;">
+                                        <span style="font-size: 0.75rem; color: var(--success-green); display: block; margin-top: 5px;">Cédula registrada y verificada con éxito.</span>
+                                    @endif
+                                </div>
+
+                                <div style="margin-bottom: 15px;">
+                                    <label class="form-label" style="text-align: left; margin-bottom: 6px;">Establecer/Cambiar Contraseña</label>
+                                    <input type="password" name="password" class="form-input" placeholder="Nueva Contraseña" style="padding-left: 15px; margin-bottom: 10px;">
+                                    <input type="password" name="password_confirmation" class="form-input" placeholder="Confirmar Nueva Contraseña" style="padding-left: 15px;">
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 5px; line-height: 1.3;">
+                                        Mínimo 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un símbolo especial.
+                                    </span>
+                                </div>
+
+                                <button type="submit" class="btn-submit" style="width: auto; padding: 10px 24px;">
+                                    Guardar Cambios de Perfil
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Configuración de Doble Factor (2FA) -->
+                        <div>
+                            <h3 style="color: var(--accent-gold); font-size: 1.1rem; margin-bottom: 15px; font-family: 'Share Tech Mono', monospace; text-transform: uppercase;">
+                                <i class="fa-solid fa-key" style="margin-right: 8px;"></i>Doble Factor (Google Authenticator)
+                            </h3>
+                            
+                            @if(auth()->user()->two_factor_enabled && !empty(auth()->user()->two_factor_secret))
+                                <div style="background: rgba(46, 204, 113, 0.1); border: 1px solid var(--success-green); border-radius: 8px; padding: 20px; display: flex; align-items: center; gap: 15px;">
+                                    <i class="fa-solid fa-circle-check" style="font-size: 2.5rem; color: var(--success-green);"></i>
+                                    <div>
+                                        <h4 style="color: var(--text-main); font-weight: 700; margin-bottom: 4px;">Doble Factor Activo</h4>
+                                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4;">Su cuenta está protegida por Google Authenticator. Se solicitará el código de 6 dígitos en cada inicio de sesión.</p>
+                                    </div>
+                                </div>
+                            @else
+                                @php
+                                    $secret = \App\Services\Google2FAService::generateSecretKey();
+                                    $qrCodeUrl = \App\Services\Google2FAService::getQRCodeUrl(auth()->user()->name, auth()->user()->email, $secret);
+                                @endphp
+                                <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4; margin-bottom: 15px;">
+                                    1. Escanee el código QR con su aplicación Google Authenticator.<br>
+                                    2. Ingrese el código temporal de 6 dígitos que aparezca en su aplicación para activar.
+                                </p>
+                                
+                                <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px; background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 8px; border: 1px solid var(--border-primary); flex-wrap: wrap;">
+                                    <div style="background: white; padding: 6px; border-radius: 6px; margin: 0 auto;">
+                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ urlencode($qrCodeUrl) }}" alt="QR Code" style="display: block; width: 120px; height: 120px;">
+                                    </div>
+                                    <div style="flex-grow: 1; text-align: center;">
+                                        <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; display: block; margin-bottom: 4px;">Clave Secreta Manual:</span>
+                                        <code style="font-family: 'Share Tech Mono', monospace; color: var(--accent-gold-hover); font-size: 1rem; font-weight: 700; letter-spacing: 1.5px; word-break: break-all;">{{ $secret }}</code>
+                                    </div>
+                                </div>
+
+                                <form action="{{ route('security.2fa-activate') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="secret" value="{{ $secret }}">
+                                    <div style="margin-bottom: 15px;">
+                                        <label class="form-label" style="text-align: left; margin-bottom: 6px;">Código de Verificación (6 dígitos)</label>
+                                        <input type="text" name="code" class="form-input" placeholder="000000" maxlength="6" autocomplete="off" required style="padding-left: 15px; font-family: 'Share Tech Mono', monospace; font-size: 1.2rem; letter-spacing: 4px; text-align: center;">
+                                    </div>
+                                    <button type="submit" class="btn-submit" style="width: auto; padding: 10px 24px;">
+                                        Activar Doble Factor
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+
+                    </div>
+                </div>
             </div>
         </main>
     </div>
