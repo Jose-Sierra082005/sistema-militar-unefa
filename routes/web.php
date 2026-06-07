@@ -4,6 +4,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\GoogleAuthController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -12,6 +13,10 @@ Route::get('/', function () {
 // Rutas de demostración del login para el pipeline CI/CD en Render
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+
+// Rutas de inicio de sesión con Google
+Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
 // Ruta de diagnóstico de base de datos
 Route::get('/db-check', function () {
