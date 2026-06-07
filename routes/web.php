@@ -7,8 +7,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoogleAuthController;
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('dashboard');
+})->middleware('auth')->name('dashboard');
+
+// Ruta de cierre de sesión
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Rutas de demostración del login para el pipeline CI/CD en Render
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
