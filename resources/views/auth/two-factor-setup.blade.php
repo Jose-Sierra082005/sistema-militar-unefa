@@ -259,6 +259,46 @@
             color: var(--accent-gold);
             margin-top: 2px;
         }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .login-card {
+                padding: 30px 20px;
+                border-radius: 12px;
+            }
+            .title {
+                font-size: 1.35rem;
+            }
+            .subtitle {
+                font-size: 0.8rem;
+            }
+            .qr-container {
+                padding: 15px;
+            }
+            .qr-image-wrapper img {
+                width: 140px;
+                height: 140px;
+            }
+            .secret-key-box {
+                font-size: 0.85rem;
+                letter-spacing: 1px;
+                padding: 6px 12px;
+                width: 100%;
+                box-sizing: border-box;
+                word-break: break-all;
+            }
+            .form-input-code {
+                font-size: 1.25rem;
+                padding: 10px;
+                letter-spacing: 4px;
+            }
+            .btn-submit {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>

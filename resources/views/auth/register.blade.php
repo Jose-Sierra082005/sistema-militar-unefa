@@ -305,6 +305,31 @@
             padding-top: 20px;
             line-height: 1.6;
         }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .login-card {
+                padding: 30px 20px;
+                border-radius: 12px;
+            }
+            .logo-container {
+                width: 60px;
+                height: 60px;
+                font-size: 1.6rem;
+            }
+            .title {
+                font-size: 1.35rem;
+            }
+            .subtitle {
+                font-size: 0.8rem;
+            }
+            .btn-submit {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>

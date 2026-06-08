@@ -229,6 +229,31 @@
             color: var(--accent-gold-hover);
             text-decoration: underline;
         }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .login-card {
+                padding: 30px 20px;
+                border-radius: 12px;
+            }
+            .title {
+                font-size: 1.35rem;
+            }
+            .subtitle {
+                font-size: 0.8rem;
+            }
+            .form-input-code {
+                font-size: 1.25rem;
+                padding: 10px;
+                letter-spacing: 4px;
+            }
+            .btn-submit {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
