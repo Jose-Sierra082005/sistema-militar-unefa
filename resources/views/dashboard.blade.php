@@ -202,7 +202,6 @@
             z-index: 10;
         }
 
-        /* Top Header */
         header {
             background: rgba(10, 14, 23, 0.85);
             backdrop-filter: blur(15px);
@@ -210,7 +209,7 @@
             padding: 16px 32px;
             display: flex;
             align-items: center;
-            justify-content: justify;
+            justify-content: space-between;
             position: sticky;
             top: 0;
             z-index: 90;
@@ -751,12 +750,52 @@
             margin-right: 15px;
         }
 
+        /* Sidebar close button */
+        .sidebar-close-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.4rem;
+            cursor: pointer;
+            margin-left: auto;
+            transition: color 0.25s ease;
+        }
+
+        .sidebar-close-btn:hover {
+            color: var(--accent-gold);
+        }
+
+        /* Mobile Sidebar Overlay Backdrop */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(4, 5, 8, 0.7);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 95;
+            transition: opacity 0.3s ease;
+        }
+
         @media (max-width: 768px) {
             aside {
                 left: -100%;
+                z-index: 100;
+                box-shadow: none;
             }
             aside.open {
                 left: 0;
+                box-shadow: 5px 0 25px rgba(0, 0, 0, 0.6);
+            }
+            #sidebar.open ~ .sidebar-overlay {
+                display: block;
+            }
+            .sidebar-close-btn {
+                display: block;
             }
             .app-container {
                 margin-left: 0;
@@ -765,23 +804,87 @@
                 display: block;
             }
             header {
-                padding: 16px 20px;
+                padding: 12px 20px;
             }
             main {
-                padding: 20px;
+                padding: 16px;
+                gap: 20px;
             }
             .welcome-card {
                 flex-direction: column;
                 gap: 15px;
                 align-items: flex-start;
+                padding: 20px;
             }
             .welcome-card-coordinates {
                 border-left: none;
-                border-top: 1.5px solid var(--accent-gold);
+                border-top: 1px solid var(--accent-gold);
                 padding-left: 0;
                 padding-top: 10px;
                 width: 100%;
                 text-align: left;
+            }
+            .workspace-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .user-details {
+                display: none;
+            }
+            .welcome-card-content h1 {
+                font-size: 1.4rem;
+            }
+            .welcome-card-content p {
+                font-size: 0.85rem;
+            }
+            .panel-header-bar {
+                padding: 12px 16px;
+            }
+            .panel-body {
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 10px 12px;
+            }
+            .header-status {
+                display: none;
+            }
+            .btn-logout span {
+                display: none;
+            }
+            .btn-logout {
+                padding: 8px;
+                border-radius: 50%;
+                width: 36px;
+                height: 36px;
+                justify-content: center;
+                align-items: center;
+                margin-left: 5px;
+            }
+            .kpi-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .modules-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .kpi-card {
+                padding: 15px;
+            }
+            #seccion-seguridad .panel-body > div {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+            }
+            #seccion-seguridad img {
+                width: 100px;
+                height: 100px;
             }
         }
     </style>
@@ -793,6 +896,7 @@
         <div class="sidebar-brand">
             <i class="fa-solid fa-shield-halved"></i>
             <span class="sidebar-brand-text">UNEFA MILITAR</span>
+            <button class="sidebar-close-btn" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <ul class="sidebar-menu">
             <li class="sidebar-item active">
@@ -854,6 +958,7 @@
             <div style="font-size: 0.7rem; color: var(--accent-gold); margin-top: 4px;">CONEXIÓN SEGURA</div>
         </div>
     </aside>
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <div class="app-container">
         <!-- Top Nav Header -->
