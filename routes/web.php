@@ -5,6 +5,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\MilitaryPersonnelController;
+use App\Http\Controllers\WeaponController;
+use App\Http\Controllers\GuardDutyController;
+use App\Http\Controllers\EvaluationController;
 
 Route::get('/', function () {
     return view('dashboard');
@@ -44,6 +48,35 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleC
 // Rutas de Ajustes de Seguridad del Dashboard
 Route::post('/security/update', [AuthController::class, 'updateSecurityProfile'])->name('security.update')->middleware('auth');
 Route::post('/security/2fa-activate', [AuthController::class, 'activateTwoFactorFromDashboard'])->name('security.2fa-activate')->middleware('auth');
+
+// Rutas de Administración Protegidas por Autenticación
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    // Personal Militar CRUD
+    Route::get('/personnel', [MilitaryPersonnelController::class, 'index'])->name('personnel.index');
+    Route::get('/personnel/create', [MilitaryPersonnelController::class, 'create'])->name('personnel.create');
+    Route::post('/personnel', [MilitaryPersonnelController::class, 'store'])->name('personnel.store');
+    Route::get('/personnel/{id}/edit', [MilitaryPersonnelController::class, 'edit'])->name('personnel.edit');
+    Route::put('/personnel/{id}', [MilitaryPersonnelController::class, 'update'])->name('personnel.update');
+    Route::delete('/personnel/{id}', [MilitaryPersonnelController::class, 'destroy'])->name('personnel.destroy');
+
+    // Parque de Armas CRUD
+    Route::get('/armory', [WeaponController::class, 'index'])->name('armory.index');
+    Route::get('/armory/create', [WeaponController::class, 'create'])->name('armory.create');
+    Route::post('/armory', [WeaponController::class, 'store'])->name('armory.store');
+    Route::get('/armory/{id}/edit', [WeaponController::class, 'edit'])->name('armory.edit');
+    Route::put('/armory/{id}', [WeaponController::class, 'update'])->name('armory.update');
+    Route::delete('/armory/{id}', [WeaponController::class, 'destroy'])->name('armory.destroy');
+
+    // Guardias y Roles
+    Route::get('/guards', [GuardDutyController::class, 'index'])->name('guards.index');
+    Route::post('/guards', [GuardDutyController::class, 'store'])->name('guards.store');
+    Route::delete('/guards/{id}', [GuardDutyController::class, 'destroy'])->name('guards.destroy');
+
+    // Evaluaciones
+    Route::get('/evaluations', [EvaluationController::class, 'index'])->name('evaluations.index');
+    Route::post('/evaluations', [EvaluationController::class, 'store'])->name('evaluations.store');
+    Route::delete('/evaluations/{id}', [EvaluationController::class, 'destroy'])->name('evaluations.destroy');
+});
 
 // Ruta de diagnóstico de base de datos
 Route::get('/db-check', function () {
