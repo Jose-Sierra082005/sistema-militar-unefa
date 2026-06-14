@@ -310,4 +310,155 @@ class AuthController extends Controller
 
         return back()->withErrors(['code' => 'Código de verificación incorrecto. Inténtelo de nuevo.']);
     }
+
+    public function showForgotForm()
+    {
+        return view('auth.forgot');
+    }
+
+    public function sendResetOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ], [
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El formato del correo electrónico no es válido.',
+            'email.exists' => 'No se encontró ningún oficial registrado con este correo electrónico.',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        // Generate 6-digit OTP
+        $otp = sprintf("%06d", mt_rand(0, 999999));
+        $expiresAt = now()->addMinutes(15);
+
+        // Store OTP in database
+        \Illuminate\Support\Facades\DB::table('password_reset_otps')->insert([
+            'email' => $request->email,
+            'otp' => $otp,
+            'expires_at' => $expiresAt,
+            'created_at' => now(),
+        ]);
+
+        // Send Email via Resend
+        $emailSent = \App\Services\EmailService::sendOtpEmail($request->email, $user->name, $otp);
+
+        if ($emailSent) {
+            session(['password.reset.email' => $request->email]);
+            return redirect()->route('password.verify_otp')->with('success', 'Se ha enviado un código de seguridad OTP a su correo electrónico.');
+        }
+
+        return back()->withErrors(['email' => 'No se pudo enviar el correo de recuperación. Inténtelo más tarde.'])->withInput();
+    }
+
+    public function showVerifyOtpForm()
+    {
+        $email = session('password.reset.email');
+        if (!$email) {
+            return redirect()->route('password.forgot');
+        }
+
+        $user = User::where('email', $email)->first();
+        $requires2fa = $user && $user->two_factor_enabled && !empty($user->two_factor_secret);
+
+        return view('auth.verify-otp', compact('requires2fa', 'email'));
+    }
+
+    public function verifyResetOtp(Request $request)
+    {
+        $email = session('password.reset.email');
+        if (!$email) {
+            return redirect()->route('password.forgot');
+        }
+
+        $user = User::where('email', $email)->firstOrFail();
+        $requires2fa = $user->two_factor_enabled && !empty($user->two_factor_secret);
+
+        $rules = [
+            'code' => 'required|string|size:6',
+        ];
+        $messages = [
+            'code.required' => 'El código OTP de verificación es obligatorio.',
+            'code.size' => 'El código OTP debe ser de 6 dígitos.',
+        ];
+
+        if ($requires2fa) {
+            $rules['two_factor_code'] = 'required|string|size:6';
+            $messages['two_factor_code.required'] = 'El código de Doble Factor (2FA) es obligatorio para cuentas protegidas.';
+            $messages['two_factor_code.size'] = 'El código de Doble Factor (2FA) debe ser de 6 dígitos.';
+        }
+
+        $request->validate($rules, $messages);
+
+        // Validate OTP from database
+        $otpRecord = \Illuminate\Support\Facades\DB::table('password_reset_otps')
+            ->where('email', $email)
+            ->where('otp', $request->code)
+            ->where('expires_at', '>=', now())
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (!$otpRecord) {
+            return back()->withErrors(['code' => 'El código OTP ingresado es inválido o ha expirado.'])->withInput();
+        }
+
+        // Validate 2FA if active
+        if ($requires2fa) {
+            $isValid2fa = Google2FAService::verifyCode($user->two_factor_secret, $request->two_factor_code);
+            if (!$isValid2fa) {
+                return back()->withErrors(['two_factor_code' => 'El código de Doble Factor (2FA) es incorrecto o ha expirado.'])->withInput();
+            }
+        }
+
+        // Mark OTP as verified in session
+        session(['password.reset.verified' => true]);
+
+        // Clean verified OTP record from database
+        \Illuminate\Support\Facades\DB::table('password_reset_otps')->where('email', $email)->delete();
+
+        return redirect()->route('password.reset')->with('success', 'Código(s) de seguridad verificado(s) con éxito. Proceda a cambiar su contraseña.');
+    }
+
+    public function showResetForm()
+    {
+        if (!session('password.reset.verified') || !session('password.reset.email')) {
+            return redirect()->route('password.forgot');
+        }
+
+        return view('auth.reset');
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $email = session('password.reset.email');
+        if (!session('password.reset.verified') || !$email) {
+            return redirect()->route('password.forgot');
+        }
+
+        $request->validate([
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                // Regex: at least 1 uppercase, 1 lowercase, 1 number, 1 special character
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+            ],
+        ], [
+            'password.required' => 'La nueva contraseña es obligatoria.',
+            'password.min' => 'La contraseña debe tener al menos :min caracteres.',
+            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+            'password.regex' => 'Seguridad del Sistema: La clave debe incluir al menos una letra mayúscula, una letra minúscula, un número y un carácter especial (@, $, !, %, *, ?, &).',
+        ]);
+
+        $user = User::where('email', $email)->firstOrFail();
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        // Clear password reset session data
+        session()->forget(['password.reset.email', 'password.reset.verified']);
+
+        return redirect()->route('login')->with('success', 'Contraseña restablecida con éxito. Inicie sesión con su nueva clave.');
+    }
 }

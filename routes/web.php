@@ -25,6 +25,14 @@ Route::post('/two-factor/activate', [AuthController::class, 'activateTwoFactor']
 Route::get('/two-factor/verify', [AuthController::class, 'showTwoFactorVerify'])->name('two-factor.verify');
 Route::post('/two-factor/verify', [AuthController::class, 'verifyTwoFactor']);
 
+// Rutas de Recuperación de Contraseña
+Route::get('/password/forgot', [AuthController::class, 'showForgotForm'])->name('password.forgot');
+Route::post('/password/forgot', [AuthController::class, 'sendResetOtp']);
+Route::get('/password/verify-otp', [AuthController::class, 'showVerifyOtpForm'])->name('password.verify_otp');
+Route::post('/password/verify-otp', [AuthController::class, 'verifyResetOtp']);
+Route::get('/password/reset', [AuthController::class, 'showResetForm'])->name('password.reset');
+Route::post('/password/reset', [AuthController::class, 'resetPassword']);
+
 // Rutas de demostración del login para el pipeline CI/CD en Render
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
