@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Models\Question;
+use App\Models\Option;
 
 class CourseController extends Controller
 {
@@ -47,7 +49,9 @@ class CourseController extends Controller
 
     public function show($id)
     {
-        $course = Course::with('lessons')->findOrFail($id);
+        $course = Course::with(['lessons' => function($query) {
+            $query->orderBy('order', 'asc')->orderBy('id', 'asc');
+        }, 'lessons.questions.options'])->findOrFail($id);
         return view('admin.courses.show', compact('course'));
     }
 
@@ -104,5 +108,43 @@ class CourseController extends Controller
         $lesson->delete();
 
         return redirect()->route('admin.courses.show', $courseId)->with('success', 'Lección eliminada de la planificación del curso.');
+    }
+
+    public function storeQuestion(Request $request, $lesson_id)
+    {
+        $lesson = Lesson::findOrFail($lesson_id);
+
+        $request->validate([
+            'question_text' => 'required|string',
+            'points' => 'required|integer|min:1',
+            'options' => 'required|array|size:4',
+            'options.*' => 'required|string',
+            'correct_option' => 'required|integer|between:0,3',
+        ]);
+
+        $question = Question::create([
+            'lesson_id' => $lesson->id,
+            'question_text' => $request->question_text,
+            'points' => $request->points,
+        ]);
+
+        foreach ($request->options as $index => $optionText) {
+            Option::create([
+                'question_id' => $question->id,
+                'option_text' => $optionText,
+                'is_correct' => ($index == $request->correct_option),
+            ]);
+        }
+
+        return redirect()->route('admin.courses.show', $lesson->course_id)->with('success', 'Pregunta agregada con éxito al cuestionario de la lección.');
+    }
+
+    public function destroyQuestion($id)
+    {
+        $question = Question::with('lesson')->findOrFail($id);
+        $courseId = $question->lesson->course_id;
+        $question->delete();
+
+        return redirect()->route('admin.courses.show', $courseId)->with('success', 'Pregunta eliminada con éxito del cuestionario.');
     }
 }

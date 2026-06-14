@@ -10,9 +10,13 @@ use App\Http\Controllers\WeaponController;
 use App\Http\Controllers\GuardDutyController;
 use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\StudentPortalController;
 
 Route::get('/', function () {
-    return view('dashboard');
+    if (auth()->check() && auth()->user()->role === 'admin') {
+        return view('dashboard');
+    }
+    return redirect()->route('student.dashboard');
 })->middleware('auth')->name('dashboard');
 
 // Ruta de cierre de sesión
@@ -50,8 +54,8 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleC
 Route::post('/security/update', [AuthController::class, 'updateSecurityProfile'])->name('security.update')->middleware('auth');
 Route::post('/security/2fa-activate', [AuthController::class, 'activateTwoFactorFromDashboard'])->name('security.2fa-activate')->middleware('auth');
 
-// Rutas de Administración Protegidas por Autenticación
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+// Rutas de Administración Protegidas por Autenticación y Rol
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // Personal Militar CRUD
     Route::get('/personnel', [MilitaryPersonnelController::class, 'index'])->name('personnel.index');
     Route::get('/personnel/create', [MilitaryPersonnelController::class, 'create'])->name('personnel.create');
@@ -86,10 +90,29 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/courses/{course_id}/lessons', [CourseController::class, 'storeLesson'])->name('lessons.store');
     Route::delete('/lessons/{id}', [CourseController::class, 'destroyLesson'])->name('lessons.destroy');
 
+    // Cuestionarios del LMS
+    Route::post('/lessons/{lesson_id}/questions', [CourseController::class, 'storeQuestion'])->name('questions.store');
+    Route::delete('/questions/{id}', [CourseController::class, 'destroyQuestion'])->name('questions.destroy');
+
     // Evaluaciones Académicas
     Route::get('/evaluations', [EvaluationController::class, 'index'])->name('evaluations.index');
     Route::post('/evaluations', [EvaluationController::class, 'store'])->name('evaluations.store');
     Route::delete('/evaluations/{id}', [EvaluationController::class, 'destroy'])->name('evaluations.destroy');
+});
+
+// Rutas de Estudiantes Protegidas por Autenticación y Rol
+Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
+    Route::get('/', [StudentPortalController::class, 'index'])->name('index');
+    Route::get('/dashboard', [StudentPortalController::class, 'index'])->name('dashboard');
+    Route::get('/personnel', [StudentPortalController::class, 'personnel'])->name('personnel.index');
+    Route::get('/armory', [StudentPortalController::class, 'armory'])->name('armory.index');
+    Route::get('/guards', [StudentPortalController::class, 'guards'])->name('guards.index');
+
+    Route::get('/courses/{id}', [StudentPortalController::class, 'showCourse'])->name('courses.show');
+    Route::get('/lessons/{id}', [StudentPortalController::class, 'showLesson'])->name('lessons.show');
+    Route::get('/lessons/{id}/download', [StudentPortalController::class, 'downloadPdf'])->name('lessons.download');
+    Route::get('/lessons/{id}/quiz', [StudentPortalController::class, 'startQuiz'])->name('lessons.quiz');
+    Route::post('/lessons/{id}/quiz', [StudentPortalController::class, 'completeQuiz'])->name('lessons.complete_quiz');
 });
 
 // Ruta de diagnóstico de base de datos
