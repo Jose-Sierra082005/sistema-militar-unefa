@@ -64,8 +64,13 @@ class AuthController extends Controller
                 [
                     'name' => 'Oficial UNEFA (Demo)',
                     'password' => Hash::make('password123'),
+                    'role' => 'admin',
                 ]
             );
+
+            if ($demoUser->role !== 'admin') {
+                $demoUser->update(['role' => 'admin']);
+            }
 
             Auth::login($demoUser, $request->has('remember'));
             return redirect()->intended('/')->with('success', '¡Conexión segura de demostración establecida!');

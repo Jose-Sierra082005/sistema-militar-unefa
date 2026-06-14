@@ -78,7 +78,7 @@ RUN mkdir -p storage/framework/{cache,sessions,views} \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
 EXPOSE 80
 
-# 14. Al arrancar: configurar puerto dinámico, limpiar caché, migrar con vars reales, recachear y lanzar Apache
+# 14. Al arrancar: configurar puerto dinámico, limpiar caché, migrar y sembrar con vars reales, recachear y lanzar Apache
 CMD bash -c "\
     if [ ! -z \"$PORT\" ]; then \
         sed -i \"s/Listen 80/Listen $PORT/g\" /etc/apache2/ports.conf && \
@@ -91,6 +91,7 @@ CMD bash -c "\
     php artisan route:clear && \
     php artisan view:clear && \
     php artisan migrate --force --no-interaction && \
+    php artisan db:seed --force --no-interaction && \
     php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache && \
