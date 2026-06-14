@@ -679,59 +679,106 @@
             <button class="sidebar-close-btn" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <ul class="sidebar-menu">
-            <li class="sidebar-item {{ Request::routeIs('dashboard') ? 'active' : '' }}">
-                <a href="{{ route('dashboard') }}">
-                    <div class="sidebar-link-content">
-                        <i class="fa-solid fa-gauge-high"></i>
-                        <span>Panel Principal</span>
-                    </div>
-                </a>
-            </li>
-            <li class="sidebar-item {{ Request::routeIs('admin.personnel.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.personnel.index') }}">
-                    <div class="sidebar-link-content">
-                        <i class="fa-solid fa-user-shield"></i>
-                        <span>Fichero Académico</span>
-                    </div>
-                    <span class="module-badge badge-active">Activo</span>
-                </a>
-            </li>
-            <li class="sidebar-item {{ Request::routeIs('admin.courses.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.courses.index') }}">
-                    <div class="sidebar-link-content">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                        <span>Cursos y Temarios</span>
-                    </div>
-                    <span class="module-badge badge-active">Activo</span>
-                </a>
-            </li>
-            <li class="sidebar-item {{ Request::routeIs('admin.armory.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.armory.index') }}">
-                    <div class="sidebar-link-content">
-                        <i class="fa-solid fa-book-open"></i>
-                        <span>Manual de Armamento</span>
-                    </div>
-                    <span class="module-badge badge-active">Activo</span>
-                </a>
-            </li>
-            <li class="sidebar-item {{ Request::routeIs('admin.guards.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.guards.index') }}">
-                    <div class="sidebar-link-content">
-                        <i class="fa-solid fa-shield-halved"></i>
-                        <span>Procedimientos de Guardia</span>
-                    </div>
-                    <span class="module-badge badge-active">Activo</span>
-                </a>
-            </li>
-            <li class="sidebar-item {{ Request::routeIs('admin.evaluations.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.evaluations.index') }}">
-                    <div class="sidebar-link-content">
-                        <i class="fa-solid fa-file-signature"></i>
-                        <span>Evaluaciones</span>
-                    </div>
-                    <span class="module-badge badge-active">Activo</span>
-                </a>
-            </li>
+            @if(auth()->user()->role === 'admin')
+                <li class="sidebar-item {{ Request::routeIs('dashboard') ? 'active' : '' }}">
+                    <a href="{{ route('dashboard') }}">
+                        <div class="sidebar-link-content">
+                            <i class="fa-solid fa-gauge-high"></i>
+                            <span>Panel Principal</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="sidebar-item {{ Request::routeIs('admin.personnel.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.personnel.index') }}">
+                        <div class="sidebar-link-content">
+                            <i class="fa-solid fa-user-shield"></i>
+                            <span>Fichero Académico</span>
+                        </div>
+                        <span class="module-badge badge-active">Activo</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {{ Request::routeIs('admin.courses.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.courses.index') }}">
+                        <div class="sidebar-link-content">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <span>Cursos y Temarios</span>
+                        </div>
+                        <span class="module-badge badge-active">Activo</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {{ Request::routeIs('admin.armory.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.armory.index') }}">
+                        <div class="sidebar-link-content">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>Manual de Armamento</span>
+                        </div>
+                        <span class="module-badge badge-active">Activo</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {{ Request::routeIs('admin.guards.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.guards.index') }}">
+                        <div class="sidebar-link-content">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span>Procedimientos de Guardia</span>
+                        </div>
+                        <span class="module-badge badge-active">Activo</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {{ Request::routeIs('admin.evaluations.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.evaluations.index') }}">
+                        <div class="sidebar-link-content">
+                            <i class="fa-solid fa-file-signature"></i>
+                            <span>Evaluaciones</span>
+                        </div>
+                        <span class="module-badge badge-active">Activo</span>
+                    </a>
+                </li>
+            @else
+                <li class="sidebar-item {{ Request::routeIs('student.dashboard') || Request::routeIs('student.index') ? 'active' : '' }}">
+                    <a href="{{ route('student.dashboard') }}">
+                        <div class="sidebar-link-content">
+                            <i class="fa-solid fa-gauge-high"></i>
+                            <span>Panel de Control</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="sidebar-item {{ Request::routeIs('student.personnel.*') ? 'active' : '' }}">
+                    <a href="{{ route('student.personnel.index') }}">
+                        <div class="sidebar-link-content">
+                            <i class="fa-solid fa-users"></i>
+                            <span>Directorio Personal</span>
+                        </div>
+                        <span class="module-badge badge-active">Lectura</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {{ Request::routeIs('student.courses.*') || Request::routeIs('student.lessons.*') ? 'active' : '' }}">
+                    <a href="{{ route('student.dashboard') }}">
+                        <div class="sidebar-link-content">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <span>Mis Cursos</span>
+                        </div>
+                        <span class="module-badge badge-active">Activo</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {{ Request::routeIs('student.armory.*') ? 'active' : '' }}">
+                    <a href="{{ route('student.armory.index') }}">
+                        <div class="sidebar-link-content">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>Manual de Armamento</span>
+                        </div>
+                        <span class="module-badge badge-active">Lectura</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {{ Request::routeIs('student.guards.*') ? 'active' : '' }}">
+                    <a href="{{ route('student.guards.index') }}">
+                        <div class="sidebar-link-content">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span>Manual de Guardia</span>
+                        </div>
+                        <span class="module-badge badge-active">Lectura</span>
+                    </a>
+                </li>
+            @endif
             <li class="sidebar-item">
                 <a href="#">
                     <div class="sidebar-link-content">
