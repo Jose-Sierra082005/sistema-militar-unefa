@@ -28,6 +28,9 @@ class StudentPortalSeeder extends Seeder
                 'points'   => 0,
             ]
         );
+        if ($admin->role !== 'admin') {
+            $admin->update(['role' => 'admin']);
+        }
 
         $student = User::firstOrCreate(
             ['email' => 'estudiante@unefa.edu.ve'],
@@ -39,7 +42,28 @@ class StudentPortalSeeder extends Seeder
             ]
         );
 
-        $this->command->info('✔ Usuarios creados: admin@unefa.edu.ve / Student@unefa.edu.ve');
+        // Seed users for the developer to allow Google Login & direct student access
+        User::firstOrCreate(
+            ['email' => 'programador082005@gmail.com'],
+            [
+                'name'     => 'Jose Sierra (Google)',
+                'password' => Hash::make('Student123!'),
+                'role'     => 'student',
+                'points'   => 0,
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'programador082005@gmsil.com'],
+            [
+                'name'     => 'Jose Sierra (Typo)',
+                'password' => Hash::make('Student123!'),
+                'role'     => 'student',
+                'points'   => 0,
+            ]
+        );
+
+        $this->command->info('✔ Usuarios creados: admin@unefa.edu.ve / Student@unefa.edu.ve / programador082005@gmail.com');
 
         // ── Curso 1: Tácticas de Guardia ─────────────────────────────
         $course1 = Course::firstOrCreate(
