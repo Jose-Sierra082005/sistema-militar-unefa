@@ -5,7 +5,7 @@
 @section('content')
     <div style="margin-bottom: 20px;">
         <h2 style="font-family: 'Share Tech Mono', monospace; font-size: 1.8rem; text-transform: uppercase; color: var(--accent-gold); letter-spacing: 1px;">
-            Calificaciones y Notas Tácticas
+            Calificaciones y Notas Académicas
         </h2>
         <p style="color: var(--text-secondary); font-size: 0.9rem;">
             Administre las calificaciones del adiestramiento práctico, tiro, táctica de combate y materias teóricas de la UNEFA Falcón.
@@ -37,7 +37,7 @@
                 <div class="panel-body" style="padding: 16px 20px;">
                     <form action="{{ route('admin.evaluations.index') }}" method="GET" style="display: flex; gap: 15px; flex-wrap: wrap;">
                         <div style="flex-grow: 1; min-width: 200px;">
-                            <input type="text" name="search" value="{{ request('search') }}" class="form-input" placeholder="Filtrar por Estudiante, Curso o Evaluador..." style="padding: 10px 15px;">
+                            <input type="text" name="search" value="{{ request('search') }}" class="form-input" placeholder="Filtrar por Estudiante o Evaluador..." style="padding: 10px 15px;">
                         </div>
                         <button type="submit" class="btn-tactical btn-tactical-gold">
                             <i class="fa-solid fa-magnifying-glass"></i> Filtrar
@@ -83,7 +83,7 @@
                                         </td>
                                         <td>
                                             <i class="fa-solid fa-crosshairs" style="color: var(--accent-gold); margin-right: 6px; font-size: 0.85rem;"></i>
-                                            <strong>{{ $eval->course_name }}</strong>
+                                            <strong>{{ $eval->course->title ?? 'Curso Eliminado' }}</strong>
                                             @if($eval->comments)
                                                 <div style="font-size: 0.75rem; color: var(--text-secondary); font-style: italic; margin-left: 20px;">
                                                     "{{ $eval->comments }}"
@@ -163,16 +163,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Curso / Táctica</label>
-                        <select name="course_name" class="form-select" required>
+                        <label class="form-label">Curso / Asignatura</label>
+                        <select name="course_id" class="form-select" required>
                             <option value="" disabled selected>Seleccione Curso</option>
-                            <option value="Tiro de Precisión (AK-103)">Tiro de Precisión (AK-103)</option>
-                            <option value="Tácticas de Combate Terrestre">Tácticas de Combate Terrestre</option>
-                            <option value="Supervivencia, Evasión y Escape">Supervivencia, Evasión y Escape</option>
-                            <option value="Navegación Terrestre y Lectura de Mapas">Navegación Terrestre y Lectura de Mapas</option>
-                            <option value="Primeros Auxilios Militares en Combate">Primeros Auxilios Militares en Combate</option>
-                            <option value="Liderazgo y Mando de Escuadra">Liderazgo y Mando de Escuadra</option>
-                            <option value="Orden Cerrado y Disciplina Militar">Orden Cerrado y Disciplina Militar</option>
+                            @foreach($courses as $course)
+                                <option value="{{ $course->id }}">{{ $course->title }} ({{ $course->category }})</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -194,7 +190,7 @@
 
                     <div class="form-group">
                         <label class="form-label">Observaciones / Detalles</label>
-                        <textarea name="comments" class="form-input" rows="3" placeholder="ej. Excelente agrupación de disparos y control de ráfagas..." style="resize: none;"></textarea>
+                        <textarea name="comments" class="form-input" rows="3" placeholder="ej. Excelente desempeño en la prueba táctica..." style="resize: none;"></textarea>
                     </div>
 
                     <button type="submit" class="btn-tactical" style="width: 100%; justify-content: center; margin-top: 10px;">

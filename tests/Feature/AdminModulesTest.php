@@ -9,6 +9,8 @@ use App\Models\MilitaryPersonnel;
 use App\Models\Weapon;
 use App\Models\GuardShift;
 use App\Models\Evaluation;
+use App\Models\Course;
+use App\Models\Lesson;
 
 class AdminModulesTest extends TestCase
 {
@@ -107,6 +109,13 @@ class AdminModulesTest extends TestCase
     {
         $user = $this->createAdmin();
         $personnel = $this->createMilitaryPersonnel();
+        
+        $course = Course::create([
+            'title' => 'Tiro de Precisión (AK-103)',
+            'description' => 'Curso de tiro con fusil AK-103',
+            'category' => 'Armamento',
+            'difficulty' => 'Básico',
+        ]);
 
         // 1. Get index
         $response = $this->actingAs($user)->get(route('admin.evaluations.index'));
@@ -115,7 +124,7 @@ class AdminModulesTest extends TestCase
         // 2. Post store
         $response = $this->actingAs($user)->post(route('admin.evaluations.store'), [
             'personnel_id' => $personnel->id,
-            'course_name' => 'Tiro de Precisión (AK-103)',
+            'course_id' => $course->id,
             'score' => 19,
             'evaluator' => 'Cnel. José Sierra',
             'date' => '2026-06-14',
@@ -125,8 +134,66 @@ class AdminModulesTest extends TestCase
         $response->assertRedirect(route('admin.evaluations.index'));
         $this->assertDatabaseHas('evaluations', [
             'personnel_id' => $personnel->id,
-            'course_name' => 'Tiro de Precisión (AK-103)',
+            'course_id' => $course->id,
             'score' => 19,
+        ]);
+    }
+
+    public function test_admin_can_manage_courses_and_lessons(): void
+    {
+        $user = $this->createAdmin();
+
+        // 1. Get index
+        $response = $this->actingAs($user)->get(route('admin.courses.index'));
+        $response->assertStatus(200);
+
+        // 2. Post store course
+        $response = $this->actingAs($user)->post(route('admin.courses.store'), [
+            'title' => 'Táctica del Centinela',
+            'description' => 'Procedimientos para guardias y patrullas',
+            'category' => 'Táctica',
+            'difficulty' => 'Intermedio',
+        ]);
+
+        $response->assertRedirect(route('admin.courses.index'));
+        $this->assertDatabaseHas('courses', [
+            'title' => 'Táctica del Centinela',
+            'category' => 'Táctica',
+        ]);
+
+        $course = Course::where('title', 'Táctica del Centinela')->first();
+
+        // 3. Get show
+        $response = $this->actingAs($user)->get(route('admin.courses.show', $course->id));
+        $response->assertStatus(200);
+
+        // 4. Post store lesson
+        $response = $this->actingAs($user)->post(route('admin.lessons.store', $course->id), [
+            'title' => 'Consigna Particular de Garita',
+            'content' => 'Texto detallado del manual de procedimientos.',
+            'order' => 1,
+        ]);
+
+        $response->assertRedirect(route('admin.courses.show', $course->id));
+        $this->assertDatabaseHas('lessons', [
+            'course_id' => $course->id,
+            'title' => 'Consigna Particular de Garita',
+        ]);
+
+        $lesson = Lesson::where('title', 'Consigna Particular de Garita')->first();
+
+        // 5. Delete lesson
+        $response = $this->actingAs($user)->delete(route('admin.lessons.destroy', $lesson->id));
+        $response->assertRedirect(route('admin.courses.show', $course->id));
+        $this->assertDatabaseMissing('lessons', [
+            'id' => $lesson->id,
+        ]);
+
+        // 6. Delete course
+        $response = $this->actingAs($user)->delete(route('admin.courses.destroy', $course->id));
+        $response->assertRedirect(route('admin.courses.index'));
+        $this->assertDatabaseMissing('courses', [
+            'id' => $course->id,
         ]);
     }
 }

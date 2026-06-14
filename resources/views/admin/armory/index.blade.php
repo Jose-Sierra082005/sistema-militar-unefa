@@ -1,19 +1,19 @@
 @extends('layouts.admin')
 
-@section('title', 'Parque de Armas - Sistema Militar UNEFA')
+@section('title', 'Manual de Armamento y Estudio Táctico - Sistema Militar UNEFA')
 
 @section('content')
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
         <div>
             <h2 style="font-family: 'Share Tech Mono', monospace; font-size: 1.8rem; text-transform: uppercase; color: var(--accent-gold); letter-spacing: 1px;">
-                Inventario de Parque de Armas
+                Manual de Armamento y Estudio Táctico
             </h2>
             <p style="color: var(--text-secondary); font-size: 0.9rem;">
-                Control de armamento militar, municiones y equipamiento oficial asignado a efectivos de la UNEFA Falcón.
+                Biblioteca digital y catálogo técnico de armamento de estudio militar para alumnos de la UNEFA Falcón.
             </p>
         </div>
         <a href="{{ route('admin.armory.create') }}" class="btn-tactical">
-            <i class="fa-solid fa-square-plus"></i> Registrar Armamento
+            <i class="fa-solid fa-square-plus"></i> Registrar Modelo de Estudio
         </a>
     </div>
 
@@ -47,8 +47,8 @@
     <div class="panel">
         <div class="panel-header-bar">
             <div class="panel-title">
-                <i class="fa-solid fa-shield-halved"></i>
-                <span>Registros de Armamento</span>
+                <i class="fa-solid fa-book-open"></i>
+                <span>Modelos Reglamentarios de Estudio</span>
             </div>
         </div>
         <div class="panel-body" style="padding: 0;">
@@ -125,7 +125,7 @@
                             <tr>
                                 <td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 30px;">
                                     <i class="fa-solid fa-circle-info" style="font-size: 1.5rem; display: block; margin-bottom: 8px;"></i>
-                                    No se encontraron armamentos en el inventario del parque de armas.
+                                    No se encontraron modelos de armamento registrados en la biblioteca de estudio.
                                 </td>
                             </tr>
                         @endforelse

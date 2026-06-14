@@ -691,7 +691,16 @@
                 <a href="{{ route('admin.personnel.index') }}">
                     <div class="sidebar-link-content">
                         <i class="fa-solid fa-user-shield"></i>
-                        <span>Personal Militar</span>
+                        <span>Fichero Académico</span>
+                    </div>
+                    <span class="module-badge badge-active">Activo</span>
+                </a>
+            </li>
+            <li class="sidebar-item {{ Request::routeIs('admin.courses.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.courses.index') }}">
+                    <div class="sidebar-link-content">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>Cursos y Temarios</span>
                     </div>
                     <span class="module-badge badge-active">Activo</span>
                 </a>
@@ -699,8 +708,8 @@
             <li class="sidebar-item {{ Request::routeIs('admin.armory.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.armory.index') }}">
                     <div class="sidebar-link-content">
-                        <i class="fa-solid fa-gun"></i>
-                        <span>Parque de Armas</span>
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>Manual de Armamento</span>
                     </div>
                     <span class="module-badge badge-active">Activo</span>
                 </a>
@@ -708,8 +717,8 @@
             <li class="sidebar-item {{ Request::routeIs('admin.guards.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.guards.index') }}">
                     <div class="sidebar-link-content">
-                        <i class="fa-solid fa-calendar-check"></i>
-                        <span>Guardias y Roles</span>
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Procedimientos de Guardia</span>
                     </div>
                     <span class="module-badge badge-active">Activo</span>
                 </a>
