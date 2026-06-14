@@ -9,6 +9,7 @@ use App\Http\Controllers\MilitaryPersonnelController;
 use App\Http\Controllers\WeaponController;
 use App\Http\Controllers\GuardDutyController;
 use App\Http\Controllers\EvaluationController;
+use App\Http\Controllers\CourseController;
 
 Route::get('/', function () {
     return view('dashboard');
@@ -59,7 +60,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::put('/personnel/{id}', [MilitaryPersonnelController::class, 'update'])->name('personnel.update');
     Route::delete('/personnel/{id}', [MilitaryPersonnelController::class, 'destroy'])->name('personnel.destroy');
 
-    // Parque de Armas CRUD
+    // Parque de Armas CRUD (Manual de Consulta de Armamento)
     Route::get('/armory', [WeaponController::class, 'index'])->name('armory.index');
     Route::get('/armory/create', [WeaponController::class, 'create'])->name('armory.create');
     Route::post('/armory', [WeaponController::class, 'store'])->name('armory.store');
@@ -67,12 +68,25 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::put('/armory/{id}', [WeaponController::class, 'update'])->name('armory.update');
     Route::delete('/armory/{id}', [WeaponController::class, 'destroy'])->name('armory.destroy');
 
-    // Guardias y Roles
+    // Guardias y Roles (Manual de Turnos y Puestos)
     Route::get('/guards', [GuardDutyController::class, 'index'])->name('guards.index');
     Route::post('/guards', [GuardDutyController::class, 'store'])->name('guards.store');
     Route::delete('/guards/{id}', [GuardDutyController::class, 'destroy'])->name('guards.destroy');
 
-    // Evaluaciones
+    // Cursos y Temarios LMS
+    Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/create', [CourseController::class, 'create'])->name('courses.create');
+    Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
+    Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
+    Route::get('/courses/{id}/edit', [CourseController::class, 'edit'])->name('courses.edit');
+    Route::put('/courses/{id}', [CourseController::class, 'update'])->name('courses.update');
+    Route::delete('/courses/{id}', [CourseController::class, 'destroy'])->name('courses.destroy');
+
+    // Lecciones del LMS
+    Route::post('/courses/{course_id}/lessons', [CourseController::class, 'storeLesson'])->name('lessons.store');
+    Route::delete('/lessons/{id}', [CourseController::class, 'destroyLesson'])->name('lessons.destroy');
+
+    // Evaluaciones Académicas
     Route::get('/evaluations', [EvaluationController::class, 'index'])->name('evaluations.index');
     Route::post('/evaluations', [EvaluationController::class, 'store'])->name('evaluations.store');
     Route::delete('/evaluations/{id}', [EvaluationController::class, 'destroy'])->name('evaluations.destroy');

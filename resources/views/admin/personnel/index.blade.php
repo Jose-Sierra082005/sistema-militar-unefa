@@ -1,19 +1,19 @@
 @extends('layouts.admin')
 
-@section('title', 'Personal Militar - Sistema Militar UNEFA')
+@section('title', 'Fichero Académico - Sistema Militar UNEFA')
 
 @section('content')
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
         <div>
             <h2 style="font-family: 'Share Tech Mono', monospace; font-size: 1.8rem; text-transform: uppercase; color: var(--accent-gold); letter-spacing: 1px;">
-                Fichero de Personal Militar
+                Fichero Académico Militar
             </h2>
             <p style="color: var(--text-secondary); font-size: 0.9rem;">
-                Administración de fichas técnicas de oficiales de comando, instructores y estudiantes del sistema.
+                Administración de fichas técnicas de instructores, oficiales y estudiantes militares adscritos a la academia.
             </p>
         </div>
         <a href="{{ route('admin.personnel.create') }}" class="btn-tactical">
-            <i class="fa-solid fa-user-plus"></i> Registrar Oficial
+            <i class="fa-solid fa-user-plus"></i> Registrar Integrante
         </a>
     </div>
 
@@ -48,7 +48,7 @@
         <div class="panel-header-bar">
             <div class="panel-title">
                 <i class="fa-solid fa-list-check"></i>
-                <span>Registros Oficiales</span>
+                <span>Integrantes de la Academia</span>
             </div>
         </div>
         <div class="panel-body" style="padding: 0;">
@@ -106,7 +106,7 @@
                             <tr>
                                 <td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 30px;">
                                     <i class="fa-solid fa-circle-info" style="font-size: 1.5rem; display: block; margin-bottom: 8px;"></i>
-                                    No se encontraron registros de personal militar.
+                                    No se encontraron registros en el fichero académico.
                                 </td>
                             </tr>
                         @endforelse

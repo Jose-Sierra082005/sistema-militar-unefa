@@ -9,7 +9,7 @@ class Evaluation extends Model
 {
     protected $fillable = [
         'personnel_id',
-        'course_name',
+        'course_id',
         'score',
         'evaluator',
         'comments',
@@ -19,5 +19,10 @@ class Evaluation extends Model
     public function personnel(): BelongsTo
     {
         return $this->belongsTo(MilitaryPersonnel::class, 'personnel_id');
+    }
+
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class, 'course_id');
     }
 }

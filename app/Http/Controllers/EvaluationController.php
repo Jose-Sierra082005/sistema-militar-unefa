@@ -5,18 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Evaluation;
 use App\Models\MilitaryPersonnel;
+use App\Models\Course;
 
 class EvaluationController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Evaluation::with('personnel');
+        $query = Evaluation::with(['personnel', 'course']);
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('course_name', 'like', "%{$search}%")
-                  ->orWhere('evaluator', 'like', "%{$search}%")
+                $q->where('evaluator', 'like', "%{$search}%")
+                  ->orWhereHas('course', function($qc) use ($search) {
+                      $qc->where('title', 'like', "%{$search}%");
+                  })
                   ->orWhereHas('personnel', function($qp) use ($search) {
                       $qp->where('name', 'like', "%{$search}%")
                         ->orWhere('cedula', 'like', "%{$search}%");
@@ -30,14 +33,17 @@ class EvaluationController extends Controller
         // Get personnel for evaluations assignment dropdown
         $personnel = MilitaryPersonnel::orderBy('name', 'asc')->get();
 
-        return view('admin.evaluations.index', compact('evaluations', 'personnel'));
+        // Get active courses for evaluations dropdown
+        $courses = Course::orderBy('title', 'asc')->get();
+
+        return view('admin.evaluations.index', compact('evaluations', 'personnel', 'courses'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'personnel_id' => 'required|exists:military_personnel,id',
-            'course_name' => 'required|string|max:255',
+            'course_id' => 'required|exists:courses,id',
             'score' => 'required|integer|min:0|max:20',
             'evaluator' => 'required|string|max:255',
             'comments' => 'nullable|string',

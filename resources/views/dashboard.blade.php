@@ -498,53 +498,63 @@
         <div class="panel">
             <div class="panel-header-bar">
                 <div class="panel-title">
-                    <i class="fa-solid fa-cubes"></i>
-                    <span>Módulos de Comando</span>
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Módulos Académicos de Adiestramiento</span>
                 </div>
             </div>
             <div class="panel-body">
                 <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
-                    Seleccione el área del sistema a gestionar. Los módulos no activos se encuentran en la fase de planificación de la UNEFA.
+                    Seleccione el área académica del sistema a gestionar. Los módulos activos forman parte del pensum de capacitación táctica.
                 </p>
                 
                 <div class="modules-grid">
                     <!-- Module 1 -->
                     <div class="module-card">
                         <div class="module-header">
-                            <span class="module-title">Personal Militar</span>
+                            <span class="module-title">Fichero Académico</span>
                             <span class="module-badge badge-active">Activo</span>
                         </div>
-                        <p class="module-desc">Gestión integral del personal de oficiales, soldados, estudiantes militares y docentes adscritos a la sede.</p>
+                        <p class="module-desc">Gestión integral del personal de instructores, oficiales y estudiantes militares adscritos a la academia.</p>
                         <a href="{{ route('admin.personnel.index') }}" class="module-action">Ingresar <i class="fa-solid fa-arrow-right"></i></a>
                     </div>
 
                     <!-- Module 2 -->
                     <div class="module-card">
                         <div class="module-header">
-                            <span class="module-title">Inventario de Armas</span>
+                            <span class="module-title">Cursos y Temarios LMS</span>
                             <span class="module-badge badge-active">Activo</span>
                         </div>
-                        <p class="module-desc">Registro detallado de material de guerra, fusiles de asalto, municiones, asignaciones y estado de conservación.</p>
-                        <a href="{{ route('admin.armory.index') }}" class="module-action">Ingresar <i class="fa-solid fa-arrow-right"></i></a>
+                        <p class="module-desc">Gestión de cursos formativos, redacción de lecciones de estrategia y adiestramiento táctico para los cadetes.</p>
+                        <a href="{{ route('admin.courses.index') }}" class="module-action">Ingresar <i class="fa-solid fa-arrow-right"></i></a>
                     </div>
 
                     <!-- Module 3 -->
                     <div class="module-card">
                         <div class="module-header">
-                            <span class="module-title">Roles de Guardia</span>
+                            <span class="module-title">Manual de Armamento</span>
                             <span class="module-badge badge-active">Activo</span>
                         </div>
-                        <p class="module-desc">Planificación y generación automática de roles de guardia para centinelas, patrullas y oficiales de inspección.</p>
-                        <a href="{{ route('admin.guards.index') }}" class="module-action">Ingresar <i class="fa-solid fa-arrow-right"></i></a>
+                        <p class="module-desc">Biblioteca y manual técnico de consulta sobre armamento reglamentario, calibres y conservación de equipos.</p>
+                        <a href="{{ route('admin.armory.index') }}" class="module-action">Ingresar <i class="fa-solid fa-arrow-right"></i></a>
                     </div>
 
                     <!-- Module 4 -->
                     <div class="module-card">
                         <div class="module-header">
+                            <span class="module-title">Procedimientos de Guardia</span>
+                            <span class="module-badge badge-active">Activo</span>
+                        </div>
+                        <p class="module-desc">Planificación de simulaciones de puestos de guardia y manual de procedimientos de seguridad para centinelas.</p>
+                        <a href="{{ route('admin.guards.index') }}" class="module-action">Ingresar <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+
+                    <!-- Module 5 -->
+                    <div class="module-card">
+                        <div class="module-header">
                             <span class="module-title">Evaluaciones y Notas</span>
                             <span class="module-badge badge-active">Activo</span>
                         </div>
-                        <p class="module-desc">Carga de calificaciones de adiestramiento militar, aptitud física y evaluaciones teóricas de los alumnos.</p>
+                        <p class="module-desc">Carga y consulta de calificaciones de adiestramiento, aptitud y evaluaciones teóricas vinculadas a cursos.</p>
                         <a href="{{ route('admin.evaluations.index') }}" class="module-action">Ingresar <i class="fa-solid fa-arrow-right"></i></a>
                     </div>
                 </div>

@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
-@section('title', 'Roles de Guardia - Sistema Militar UNEFA')
+@section('title', 'Procedimientos y Turnos de Guardia - Sistema Militar UNEFA')
 
 @section('content')
     <div style="margin-bottom: 20px;">
         <h2 style="font-family: 'Share Tech Mono', monospace; font-size: 1.8rem; text-transform: uppercase; color: var(--accent-gold); letter-spacing: 1px;">
-            Planificación y Control de Guardias
+            Procedimientos y Turnos de Guardia
         </h2>
         <p style="color: var(--text-secondary); font-size: 0.9rem;">
-            Asigne puestos tácticos de vigilancia, controle los roles diarios y supervise el DEFCON del campus UNEFA Falcón.
+            Manual de procedimientos de seguridad, roles diarios de guardia y simulaciones tácticas para centinelas.
         </p>
     </div>
 
@@ -56,7 +56,7 @@
                 <div class="panel-header-bar">
                     <div class="panel-title">
                         <i class="fa-solid fa-calendar-check"></i>
-                        <span>Roles de Guardia Asignados</span>
+                        <span>Simulaciones y Turnos Planificados</span>
                     </div>
                 </div>
                 <div class="panel-body" style="padding: 0;">
@@ -114,7 +114,7 @@
                                     <tr>
                                         <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 30px;">
                                             <i class="fa-solid fa-circle-info" style="font-size: 1.5rem; display: block; margin-bottom: 8px;"></i>
-                                            No hay turnos de guardia registrados en la planificación.
+                                            No hay simulaciones de guardia registradas en la planificación.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -137,7 +137,7 @@
             <div class="panel-header-bar">
                 <div class="panel-title">
                     <i class="fa-solid fa-user-clock"></i>
-                    <span>Asignar Turno de Guardia</span>
+                    <span>Planificar Simulación / Puesto</span>
                 </div>
             </div>
             <div class="panel-body">
