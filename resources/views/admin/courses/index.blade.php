@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Cursos Tácticos - Sistema Militar UNEFA')
+@section('title', 'Cursos Tácticos - Tactic Force')
 
 @section('content')
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">

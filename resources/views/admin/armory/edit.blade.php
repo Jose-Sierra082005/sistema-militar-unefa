@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Editar Armamento - Sistema Militar UNEFA')
+@section('title', 'Editar Armamento - Tactic Force')
 
 @section('content')
     <div style="margin-bottom: 20px;">

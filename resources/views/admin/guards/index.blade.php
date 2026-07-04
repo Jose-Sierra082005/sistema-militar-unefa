@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Procedimientos y Turnos de Guardia - Sistema Militar UNEFA')
+@section('title', 'Procedimientos y Turnos de Guardia - Tactic Force')
 
 @section('content')
     <div style="margin-bottom: 20px;">

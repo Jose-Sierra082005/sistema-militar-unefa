@@ -250,7 +250,7 @@ class StudentPortalController extends Controller
     {
         $lesson   = Lesson::with('course')->findOrFail($id);
         $content  = "=================================================================\n";
-        $content .= "             SISTEMA MILITAR DE APRENDIZAJE UNEFA\n";
+        $content .= "             TACTIC FORCE\n";
         $content .= "             MANUAL DE ESTUDIO TACTICO ACADEMICO\n";
         $content .= "=================================================================\n\n";
         $content .= "CURSO: "      . mb_strtoupper($lesson->course->title)     . "\n";

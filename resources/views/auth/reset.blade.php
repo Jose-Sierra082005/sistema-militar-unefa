@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Establecer Nueva Contraseña - Sistema Militar UNEFA</title>
+    <title>Establecer Nueva Contraseña - Tactic Force</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -283,7 +283,7 @@
                 <i class="fa-solid fa-lock-open"></i>
             </div>
             <h2 class="title">Nueva Contraseña</h2>
-            <p class="subtitle">Establezca una clave de alta seguridad para su cuenta del Sistema Militar.</p>
+            <p class="subtitle">Establezca una clave de alta seguridad para su cuenta en Tactic Force.</p>
         </div>
 
         @if (session('success'))

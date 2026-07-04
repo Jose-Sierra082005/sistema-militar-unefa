@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Seguro - Sistema Militar UNEFA</title>
+    <title>Acceso Seguro - Tactic Force</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -518,7 +518,7 @@
             <div class="logo-container">
                 <i class="fa-solid fa-shield-halved"></i>
             </div>
-            <h2 class="title">Sistema Militar</h2>
+            <h2 class="title">Tactic Force</h2>
             <p class="subtitle">Portal de Formación y Evaluaciones Académicas <br> UNEFA Falcón</p>
         </div>
 
@@ -562,7 +562,7 @@
             </div>
 
             <button type="submit" class="btn-submit">
-                Ingresar al Sistema
+                Ingresar a Tactic Force
             </button>
         </form>
 
@@ -585,7 +585,7 @@
         </div>
 
         <div class="footer">
-            <p>&copy; 2026 Sistema Militar UNEFA. Todos los derechos reservados.</p>
+            <p>&copy; 2026 Tactic Force. Todos los derechos reservados.</p>
             <p>Soporte Técnico: <a href="mailto:soporte@unefafalcon.edu.ve">soporte@unefafalcon.edu.ve</a></p>
         </div>
     </div>

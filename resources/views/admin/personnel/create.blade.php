@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Registrar Oficial - Sistema Militar UNEFA')
+@section('title', 'Registrar Oficial - Tactic Force')
 
 @section('content')
     <div style="margin-bottom: 20px;">

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Services;
 
@@ -21,7 +21,7 @@ class Google2FAService
     /**
      * Generates the otpauth:// URI to scan with Authenticator apps.
      */
-    public static function getQRCodeUrl($name, $email, $secret, $issuer = 'Sistema Militar UNEFA')
+    public static function getQRCodeUrl($name, $email, $secret, $issuer = 'Tactic Force')
     {
         $label = rawurlencode($issuer . ':' . $email);
         $issuer = rawurlencode($issuer);

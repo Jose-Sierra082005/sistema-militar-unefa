@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recuperar Contraseña - Sistema Militar UNEFA</title>
+    <title>Recuperar Contraseña - Tactic Force</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -382,7 +382,7 @@
         </div>
 
         <div class="footer">
-            <p>&copy; 2026 Sistema Militar UNEFA. Todos los derechos reservados.</p>
+            <p>&copy; 2026 Tactic Force. Todos los derechos reservados.</p>
         </div>
     </div>
 

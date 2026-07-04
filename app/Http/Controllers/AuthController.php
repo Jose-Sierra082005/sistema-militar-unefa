@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -23,7 +23,7 @@ class AuthController extends Controller
         ], [
             'email.required' => 'La identificación (cédula o correo) es obligatoria.',
             'password.required' => 'La contraseña de acceso es obligatoria.',
-            'password.min' => 'Seguridad del Sistema: La clave debe tener al menos :min caracteres.',
+            'password.min' => 'Seguridad de Tactic Force: La clave debe tener al menos :min caracteres.',
         ]);
 
         $loginInput = trim($request->email);
@@ -133,7 +133,7 @@ class AuthController extends Controller
             'email.unique' => 'Este correo electrónico ya se encuentra registrado.',
             'password.min' => 'Seguridad Militar: La contraseña debe tener al menos :min caracteres.',
             'password.confirmed' => 'La confirmación de la contraseña no coincide.',
-            'password.regex' => 'Seguridad del Sistema: La clave debe incluir al menos una letra mayúscula, una letra minúscula, un número y un carácter especial (@, $, !, %, *, ?, &).',
+            'password.regex' => 'Seguridad de Tactic Force: La clave debe incluir al menos una letra mayúscula, una letra minúscula, un número y un carácter especial (@, $, !, %, *, ?, &).',
         ]);
 
         // Create new user (2FA disabled by default until verified in setup screen)
@@ -453,7 +453,7 @@ class AuthController extends Controller
             'password.required' => 'La nueva contraseña es obligatoria.',
             'password.min' => 'La contraseña debe tener al menos :min caracteres.',
             'password.confirmed' => 'La confirmación de la contraseña no coincide.',
-            'password.regex' => 'Seguridad del Sistema: La clave debe incluir al menos una letra mayúscula, una letra minúscula, un número y un carácter especial (@, $, !, %, *, ?, &).',
+            'password.regex' => 'Seguridad de Tactic Force: La clave debe incluir al menos una letra mayúscula, una letra minúscula, un número y un carácter especial (@, $, !, %, *, ?, &).',
         ]);
 
         $user = User::where('email', $email)->firstOrFail();

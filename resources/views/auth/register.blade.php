@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Oficial - Sistema Militar UNEFA</title>
+    <title>Registro de Oficial - Tactic Force</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -353,7 +353,7 @@
                 <i class="fa-solid fa-user-plus"></i>
             </div>
             <h2 class="title">Alta de Oficial</h2>
-            <p class="subtitle">Ingrese sus credenciales de registro para el Sistema Militar UNEFA</p>
+            <p class="subtitle">Ingrese sus credenciales de registro en Tactic Force</p>
         </div>
 
         @if ($errors->any())
@@ -424,7 +424,7 @@
         </div>
 
         <div class="footer">
-            <p>&copy; 2026 Sistema Militar UNEFA. Todos los derechos reservados.</p>
+            <p>&copy; 2026 Tactic Force. Todos los derechos reservados.</p>
         </div>
     </div>
 

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Fichero Académico - Sistema Militar UNEFA')
+@section('title', 'Fichero Académico - Tactic Force')
 
 @section('content')
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', $course->title . ' - Sistema Militar UNEFA')
+@section('title', $course->title . ' - Tactic Force')
 
 @section('styles')
     <style>

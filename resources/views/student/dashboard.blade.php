@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Portal del Estudiante - Sistema Militar UNEFA')
+@section('title', 'Portal del Estudiante - Tactic Force')
 
 @section('styles')
     <style>
@@ -211,7 +211,7 @@
     <div class="student-hero">
         <div style="flex-grow: 1;">
             <div style="font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 5px;">
-                <i class="fa-solid fa-graduation-cap"></i> Academia Militar UNEFA Falcón
+                <i class="fa-solid fa-graduation-cap"></i> Tactic Force
             </div>
             <h1 style="font-size: 1.8rem; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; background: linear-gradient(135deg, var(--text-main), var(--accent-gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 Portal del Estudiante
@@ -320,7 +320,7 @@
     <!-- Acceso Rápido: Configuración de Perfil -->
     <div style="margin-top: 40px;">
         <h2 style="font-family: 'Share Tech Mono', monospace; font-size: 1.3rem; text-transform: uppercase; color: var(--accent-gold); letter-spacing: 1px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-            <i class="fa-solid fa-sliders"></i> Ajustes del Sistema
+            <i class="fa-solid fa-sliders"></i> Ajustes de Tactic Force
         </h2>
         <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">
             Gestione su información de identificación, credenciales de acceso y parámetros de seguridad de su cuenta institucional.

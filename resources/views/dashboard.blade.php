@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Panel de Control - Sistema Militar UNEFA')
+@section('title', 'Panel de Control - Tactic Force')
 
 @section('styles')
     <style>
@@ -613,7 +613,7 @@
                 <div class="panel-header-bar">
                     <div class="panel-title">
                         <i class="fa-solid fa-list-check"></i>
-                        <span>Bitácora del Sistema</span>
+                        <span>Bitácora de Tactic Force</span>
                     </div>
                 </div>
                 <div class="panel-body" style="max-height: 250px; overflow-y: auto;">
@@ -675,7 +675,7 @@
                             <label class="form-label" style="text-align: left; margin-bottom: 6px;">Cédula de Identidad</label>
                             @if(empty(auth()->user()->cedula))
                                 <input type="text" name="cedula" class="form-input" placeholder="ej. V-31149881 o 31149881" required>
-                                <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 5px;">Requerida para validez oficial del sistema militar.</span>
+                                <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 5px;">Requerida para validez oficial en Tactic Force.</span>
                             @else
                                 <input type="text" class="form-input" value="{{ auth()->user()->cedula }}" disabled style="opacity: 0.6; cursor: not-allowed;">
                                 <span style="font-size: 0.75rem; color: var(--success-green); display: block; margin-top: 5px;">Cédula registrada y verificada con éxito.</span>
