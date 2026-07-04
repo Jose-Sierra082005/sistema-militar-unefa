@@ -316,42 +316,27 @@
         </div>
     </div>
 
-    <!-- Manuales y Consulta Táctica -->
+
+    <!-- Acceso Rápido: Configuración de Perfil -->
     <div style="margin-top: 40px;">
         <h2 style="font-family: 'Share Tech Mono', monospace; font-size: 1.3rem; text-transform: uppercase; color: var(--accent-gold); letter-spacing: 1px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-            <i class="fa-solid fa-folder-open"></i> Biblioteca y Consulta Académica
+            <i class="fa-solid fa-sliders"></i> Ajustes del Sistema
         </h2>
         <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">
-            Acceda de forma segura al fichero escolar del personal militar, fichas técnicas de armamento reglamentario y manuales de procedimientos de guardia en modo lectura.
+            Gestione su información de identificación, credenciales de acceso y parámetros de seguridad de su cuenta institucional.
         </p>
 
         <div class="quick-modules">
-            <!-- Personnel -->
-            <a href="{{ route('student.personnel.index') }}" class="quick-module-card">
-                <div class="quick-module-icon"><i class="fa-solid fa-users"></i></div>
-                <div>
-                    <div class="quick-module-title">Directorio del Personal</div>
-                    <div class="quick-module-desc">Fichero académico de instructores y cadetes.</div>
+            <a href="{{ route('student.profile.show') }}" class="quick-module-card" style="max-width: 380px;">
+                <div class="quick-module-icon" style="background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border-color: rgba(212,175,55,0.3); color: var(--accent-gold);">
+                    <i class="fa-solid fa-id-card-clip"></i>
                 </div>
-            </a>
-
-            <!-- Weapons -->
-            <a href="{{ route('student.armory.index') }}" class="quick-module-card">
-                <div class="quick-module-icon"><i class="fa-solid fa-book-open"></i></div>
                 <div>
-                    <div class="quick-module-title">Manual de Armamento</div>
-                    <div class="quick-module-desc">Catálogo de consulta técnica y calibre.</div>
-                </div>
-            </a>
-
-            <!-- Guards -->
-            <a href="{{ route('student.guards.index') }}" class="quick-module-card">
-                <div class="quick-module-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                <div>
-                    <div class="quick-module-title">Manual de Guardia</div>
-                    <div class="quick-module-desc">Simulaciones de guardia planificadas.</div>
+                    <div class="quick-module-title">Configuración de Perfil</div>
+                    <div class="quick-module-desc">Actualice sus datos personales, correo y contraseña de acceso.</div>
                 </div>
             </a>
         </div>
     </div>
 @endsection
+

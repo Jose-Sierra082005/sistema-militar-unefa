@@ -104,36 +104,19 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
     Route::get('/', [StudentPortalController::class, 'index'])->name('index');
     Route::get('/dashboard', [StudentPortalController::class, 'index'])->name('dashboard');
-    Route::get('/personnel', [StudentPortalController::class, 'personnel'])->name('personnel.index');
-    Route::get('/armory', [StudentPortalController::class, 'armory'])->name('armory.index');
-    Route::get('/guards', [StudentPortalController::class, 'guards'])->name('guards.index');
 
     Route::get('/courses/{id}', [StudentPortalController::class, 'showCourse'])->name('courses.show');
     Route::get('/lessons/{id}', [StudentPortalController::class, 'showLesson'])->name('lessons.show');
     Route::get('/lessons/{id}/download', [StudentPortalController::class, 'downloadPdf'])->name('lessons.download');
     Route::get('/lessons/{id}/quiz', [StudentPortalController::class, 'startQuiz'])->name('lessons.quiz');
     Route::post('/lessons/{id}/quiz', [StudentPortalController::class, 'completeQuiz'])->name('lessons.complete_quiz');
-});
 
-// Ruta de diagnóstico de base de datos
-Route::get('/db-check', function () {
-    try {
-        $connection = \Illuminate\Support\Facades\DB::connection();
-        $dbName = $connection->getDatabaseName();
-        $driver = $connection->getDriverName();
-        $connection->getPdo(); // Forzar conexión
-        return response()->json([
-            'status' => 'success',
-            'message' => "Conexión exitosa a la base de datos!",
-            'driver' => $driver,
-            'database' => $dbName,
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Error al conectar a la base de datos',
-            'error_details' => $e->getMessage(),
-            'code' => $e->getCode(),
-        ], 500);
-    }
+    // Módulo de Configuración de Perfil
+    Route::get('/profile', [StudentPortalController::class, 'showProfile'])->name('profile.show');
+    Route::post('/profile', [StudentPortalController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/password', [StudentPortalController::class, 'updatePassword'])->name('profile.password');
+
+    // Desactivacion del Doble Factor (2FA) con verificacion OTP por correo
+    Route::post('/profile/2fa/disable-send',    [StudentPortalController::class, 'send2FADisableOtp'])->name('profile.2fa.disable.send');
+    Route::post('/profile/2fa/disable-confirm', [StudentPortalController::class, 'disable2FA'])->name('profile.2fa.disable.confirm');
 });

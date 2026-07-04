@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Sistema Militar - UNEFA')</title>
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -40,7 +43,7 @@
 
         body {
             background-color: var(--bg-dark);
-            background-image: 
+            background-image:
                 radial-gradient(circle at 10% 10%, rgba(42, 71, 51, 0.15) 0%, transparent 45%),
                 radial-gradient(circle at 90% 90%, rgba(212, 175, 55, 0.05) 0%, transparent 45%),
                 linear-gradient(rgba(7, 9, 14, 0.9), rgba(7, 9, 14, 0.95));
@@ -56,13 +59,16 @@
             width: 8px;
             height: 8px;
         }
+
         ::-webkit-scrollbar-track {
             background: var(--bg-dark);
         }
+
         ::-webkit-scrollbar-thumb {
             background: var(--tactical-green);
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: var(--accent-gold);
         }
@@ -74,7 +80,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(255, 255, 255, 0.005) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.005) 1px, transparent 1px);
             background-size: 50px 50px;
@@ -255,9 +261,20 @@
         }
 
         @keyframes pulse-light {
-            0% { transform: scale(0.9); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(0.9); opacity: 0.5; }
+            0% {
+                transform: scale(0.9);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0.9);
+                opacity: 0.5;
+            }
         }
 
         .user-menu {
@@ -346,8 +363,15 @@
         }
 
         @keyframes slide-in {
-            from { transform: translateY(-10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .alert-warning {
@@ -367,7 +391,7 @@
             background: var(--panel-bg);
             border: 1px solid var(--border-primary);
             border-radius: 16px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -455,7 +479,8 @@
             font-family: 'Share Tech Mono', monospace;
         }
 
-        .form-input, .form-select {
+        .form-input,
+        .form-select {
             width: 100%;
             background: rgba(7, 9, 14, 0.95);
             border: 1px solid var(--border-primary);
@@ -467,7 +492,8 @@
             transition: all 0.3s ease;
         }
 
-        .form-input:focus, .form-select:focus {
+        .form-input:focus,
+        .form-select:focus {
             border-color: var(--accent-gold);
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
             background: #090c13;
@@ -609,25 +635,32 @@
                 z-index: 100;
                 box-shadow: none;
             }
+
             aside.open {
                 left: 0;
                 box-shadow: 5px 0 25px rgba(0, 0, 0, 0.6);
             }
-            #sidebar.open ~ .sidebar-overlay {
+
+            #sidebar.open~.sidebar-overlay {
                 display: block;
             }
+
             .sidebar-close-btn {
                 display: block;
             }
+
             .app-container {
                 margin-left: 0;
             }
+
             .mobile-toggle {
                 display: block;
             }
+
             header {
                 padding: 12px 20px;
             }
+
             main {
                 padding: 16px;
                 gap: 20px;
@@ -638,9 +671,11 @@
             .user-details {
                 display: none;
             }
+
             .panel-header-bar {
                 padding: 12px 16px;
             }
+
             .panel-body {
                 padding: 16px;
             }
@@ -650,12 +685,15 @@
             header {
                 padding: 10px 12px;
             }
+
             .header-status {
                 display: none;
             }
+
             .btn-logout span {
                 display: none;
             }
+
             .btn-logout {
                 padding: 8px;
                 border-radius: 50%;
@@ -669,6 +707,7 @@
     </style>
     @yield('styles')
 </head>
+
 <body>
 
     <!-- Mobile Drawer Overlay -->
@@ -706,24 +745,7 @@
                         <span class="module-badge badge-active">Activo</span>
                     </a>
                 </li>
-                <li class="sidebar-item {{ Request::routeIs('admin.armory.*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.armory.index') }}">
-                        <div class="sidebar-link-content">
-                            <i class="fa-solid fa-book-open"></i>
-                            <span>Manual de Armamento</span>
-                        </div>
-                        <span class="module-badge badge-active">Activo</span>
-                    </a>
-                </li>
-                <li class="sidebar-item {{ Request::routeIs('admin.guards.*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.guards.index') }}">
-                        <div class="sidebar-link-content">
-                            <i class="fa-solid fa-shield-halved"></i>
-                            <span>Procedimientos de Guardia</span>
-                        </div>
-                        <span class="module-badge badge-active">Activo</span>
-                    </a>
-                </li>
+
                 <li class="sidebar-item {{ Request::routeIs('admin.evaluations.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.evaluations.index') }}">
                         <div class="sidebar-link-content">
@@ -734,7 +756,8 @@
                     </a>
                 </li>
             @else
-                <li class="sidebar-item {{ Request::routeIs('student.dashboard') || Request::routeIs('student.index') ? 'active' : '' }}">
+                <li
+                    class="sidebar-item {{ Request::routeIs('student.dashboard') || Request::routeIs('student.index') ? 'active' : '' }}">
                     <a href="{{ route('student.dashboard') }}">
                         <div class="sidebar-link-content">
                             <i class="fa-solid fa-gauge-high"></i>
@@ -742,16 +765,17 @@
                         </div>
                     </a>
                 </li>
-                <li class="sidebar-item {{ Request::routeIs('student.personnel.*') ? 'active' : '' }}">
-                    <a href="{{ route('student.personnel.index') }}">
+                <li class="sidebar-item {{ Request::routeIs('student.profile.*') ? 'active' : '' }}">
+                    <a href="{{ route('student.profile.show') }}">
                         <div class="sidebar-link-content">
-                            <i class="fa-solid fa-users"></i>
-                            <span>Directorio Personal</span>
+                            <i class="fa-solid fa-id-card-clip"></i>
+                            <span>Mi Perfil</span>
                         </div>
-                        <span class="module-badge badge-active">Lectura</span>
+                        <span class="module-badge badge-active">Activo</span>
                     </a>
                 </li>
-                <li class="sidebar-item {{ Request::routeIs('student.courses.*') || Request::routeIs('student.lessons.*') ? 'active' : '' }}">
+                <li
+                    class="sidebar-item {{ Request::routeIs('student.courses.*') || Request::routeIs('student.lessons.*') ? 'active' : '' }}">
                     <a href="{{ route('student.dashboard') }}">
                         <div class="sidebar-link-content">
                             <i class="fa-solid fa-graduation-cap"></i>
@@ -760,34 +784,9 @@
                         <span class="module-badge badge-active">Activo</span>
                     </a>
                 </li>
-                <li class="sidebar-item {{ Request::routeIs('student.armory.*') ? 'active' : '' }}">
-                    <a href="{{ route('student.armory.index') }}">
-                        <div class="sidebar-link-content">
-                            <i class="fa-solid fa-book-open"></i>
-                            <span>Manual de Armamento</span>
-                        </div>
-                        <span class="module-badge badge-active">Lectura</span>
-                    </a>
-                </li>
-                <li class="sidebar-item {{ Request::routeIs('student.guards.*') ? 'active' : '' }}">
-                    <a href="{{ route('student.guards.index') }}">
-                        <div class="sidebar-link-content">
-                            <i class="fa-solid fa-shield-halved"></i>
-                            <span>Manual de Guardia</span>
-                        </div>
-                        <span class="module-badge badge-active">Lectura</span>
-                    </a>
-                </li>
+
             @endif
-            <li class="sidebar-item">
-                <a href="#">
-                    <div class="sidebar-link-content">
-                        <i class="fa-solid fa-key"></i>
-                        <span>Comunicaciones</span>
-                    </div>
-                    <span class="module-badge badge-planned">Plan</span>
-                </a>
-            </li>
+
         </ul>
         <div class="sidebar-footer">
             <div>SISTEMA MILITAR v2.1</div>
@@ -823,7 +822,7 @@
                 <div class="user-avatar" title="{{ auth()->user()->email }}">
                     <i class="fa-solid fa-user-tie"></i>
                 </div>
-                
+
                 <!-- Logout Form -->
                 <form action="{{ route('logout') }}" method="POST" style="margin-left: 10px;">
                     @csrf
@@ -847,4 +846,5 @@
     </script>
     @yield('scripts')
 </body>
+
 </html>
