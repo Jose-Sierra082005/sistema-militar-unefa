@@ -466,4 +466,153 @@ class AuthController extends Controller
 
         return redirect()->route('login')->with('success', 'Contraseña restablecida con éxito. Inicie sesión con su nueva clave.');
     }
+
+    public function showTwoFactorRecoverForm()
+    {
+        $prefillEmail = old('email');
+
+        if (!$prefillEmail && session('password.reset.email')) {
+            $prefillEmail = session('password.reset.email');
+        }
+
+        if (!$prefillEmail && session('auth.2fa.user_id')) {
+            $user = User::find(session('auth.2fa.user_id'));
+            $prefillEmail = $user?->email;
+        }
+
+        return view('auth.two-factor-recover', compact('prefillEmail'));
+    }
+
+    public function sendTwoFactorRecoverOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ], [
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El formato del correo electrónico no es válido.',
+            'email.exists' => 'No se encontró ninguna cuenta registrada con este correo electrónico.',
+        ]);
+
+        $user = User::where('email', $request->email)->firstOrFail();
+
+        if (!$user->two_factor_enabled || empty($user->two_factor_secret)) {
+            return back()->withErrors([
+                'email' => 'Esta cuenta no tiene Google Authenticator activo. Puede recuperar su contraseña sin código 2FA.',
+            ])->withInput();
+        }
+
+        $otp = sprintf('%06d', mt_rand(0, 999999));
+
+        session([
+            '2fa.recover.email' => $user->email,
+            '2fa.recover.user_id' => $user->id,
+            '2fa.recover.otp' => $otp,
+            '2fa.recover.expires' => now()->addMinutes(15)->timestamp,
+        ]);
+        session()->forget('2fa.recover.verified');
+
+        $emailSent = \App\Services\EmailService::sendOtpEmail($user->email, $user->name, $otp);
+
+        if (!$emailSent) {
+            return back()->withErrors([
+                'email' => 'No se pudo enviar el correo de verificación. Inténtelo más tarde.',
+            ])->withInput();
+        }
+
+        return redirect()->route('two-factor.recover.verify')
+            ->with('success', 'Se envió un código OTP a su correo para restablecer Google Authenticator.');
+    }
+
+    public function showTwoFactorRecoverVerifyForm()
+    {
+        if (!session('2fa.recover.email') || !session('2fa.recover.user_id')) {
+            return redirect()->route('two-factor.recover')
+                ->withErrors(['email' => 'Sesión de recuperación expirada. Inicie el proceso nuevamente.']);
+        }
+
+        return view('auth.two-factor-recover-verify', [
+            'email' => session('2fa.recover.email'),
+        ]);
+    }
+
+    public function verifyTwoFactorRecoverOtp(Request $request)
+    {
+        if (!session('2fa.recover.email') || !session('2fa.recover.user_id')) {
+            return redirect()->route('two-factor.recover');
+        }
+
+        $request->validate([
+            'code' => 'required|string|size:6',
+        ], [
+            'code.required' => 'El código OTP es obligatorio.',
+            'code.size' => 'El código OTP debe ser de 6 dígitos.',
+        ]);
+
+        $storedOtp = session('2fa.recover.otp');
+        $expires = session('2fa.recover.expires');
+
+        if (!$storedOtp || !$expires || now()->timestamp > $expires || $request->code !== $storedOtp) {
+            return back()->withErrors([
+                'code' => 'El código OTP ingresado es inválido o ha expirado.',
+            ])->withInput();
+        }
+
+        session(['2fa.recover.verified' => true]);
+        session()->forget(['2fa.recover.otp', '2fa.recover.expires']);
+
+        return redirect()->route('two-factor.recover.setup')
+            ->with('success', 'Identidad verificada. Escanee el nuevo código QR en Google Authenticator.');
+    }
+
+    public function showTwoFactorRecoverSetup()
+    {
+        if (!session('2fa.recover.verified') || !session('2fa.recover.user_id')) {
+            return redirect()->route('two-factor.recover');
+        }
+
+        $user = User::findOrFail(session('2fa.recover.user_id'));
+        $secret = Google2FAService::generateSecretKey();
+        $qrCodeUrl = Google2FAService::getQRCodeUrl($user->name, $user->email, $secret);
+
+        return view('auth.two-factor-setup', [
+            'secret' => $secret,
+            'qrCodeUrl' => $qrCodeUrl,
+            'recoverMode' => true,
+            'activateRoute' => route('two-factor.recover.activate'),
+        ]);
+    }
+
+    public function activateTwoFactorRecover(Request $request)
+    {
+        $request->validate([
+            'secret' => 'required|string',
+            'code' => 'required|string|size:6',
+        ]);
+
+        if (!session('2fa.recover.verified') || !session('2fa.recover.user_id')) {
+            return redirect()->route('two-factor.recover');
+        }
+
+        $user = User::findOrFail(session('2fa.recover.user_id'));
+
+        if (!Google2FAService::verifyCode($request->secret, $request->code)) {
+            return back()->withErrors(['code' => 'Código de verificación incorrecto. Inténtelo de nuevo.']);
+        }
+
+        $user->update([
+            'two_factor_secret' => $request->secret,
+            'two_factor_enabled' => true,
+        ]);
+
+        session()->forget([
+            '2fa.recover.email',
+            '2fa.recover.user_id',
+            '2fa.recover.verified',
+            'auth.2fa.user_id',
+            'auth.2fa.remember',
+        ]);
+
+        return redirect()->route('login')
+            ->with('success', 'Google Authenticator restablecido con éxito. Use el nuevo código en su app e inicie sesión.');
+    }
 }

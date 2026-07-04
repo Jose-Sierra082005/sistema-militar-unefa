@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verificación de Seguridad - Tactic Force</title>
+    <title>Verificar OTP - Restablecer 2FA - Tactic Force</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,7 +53,6 @@
             position: relative;
         }
 
-        /* Tactical HUD grid overlay */
         body::before {
             content: '';
             position: absolute;
@@ -71,7 +70,7 @@
 
         .login-card {
             width: 100%;
-            max-width: 460px;
+            max-width: 480px;
             background: var(--panel-bg);
             backdrop-filter: blur(20px);
             border: 1px solid var(--border-primary);
@@ -219,6 +218,12 @@
             color: #ff9999;
         }
 
+        .alert-success {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid var(--success-green);
+            color: #9fedc0;
+        }
+
         .forgot-link {
             color: var(--accent-gold);
             text-decoration: none;
@@ -239,7 +244,7 @@
                 border-radius: 12px;
             }
             .title {
-                font-size: 1.35rem;
+                font-size: 1.3rem;
             }
             .subtitle {
                 font-size: 0.8rem;
@@ -266,51 +271,51 @@
 
         <div style="text-align: center;">
             <div class="security-badge">
-                <i class="fa-solid fa-shield-halved"></i> Autenticación 2FA
+                <i class="fa-solid fa-shield-halved"></i> Verificación Requerida
             </div>
         </div>
 
         <div class="header">
             <div class="logo-container">
-                <i class="fa-solid fa-key"></i>
+                <i class="fa-solid fa-lock"></i>
             </div>
-            <h2 class="title">Código de Seguridad</h2>
-            <p class="subtitle">Ingrese el código temporal de 6 dígitos de su aplicación Google Authenticator</p>
+            <h2 class="title">Verificar Correo</h2>
+            <p class="subtitle">Ingrese el código OTP enviado a <strong style="color: var(--accent-gold);">{{ $email }}</strong> para continuar con el restablecimiento de Google Authenticator.</p>
         </div>
 
-        @if (session('error'))
-            <div class="alert alert-danger">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <span>{{ session('error') }}</span>
+        @if (session('success'))
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>{{ session('success') }}</span>
             </div>
         @endif
 
         @if ($errors->any())
             <div class="alert alert-danger">
                 <i class="fa-solid fa-circle-exclamation"></i>
-                <span>{{ $errors->first() }}</span>
+                <div style="display: flex; flex-direction: column;">
+                    @foreach ($errors->all() as $error)
+                        <span>{{ $error }}</span>
+                    @endforeach
+                </div>
             </div>
         @endif
 
-        <form action="{{ route('two-factor.verify') }}" method="POST">
+        <form action="{{ route('two-factor.recover.verify.submit') }}" method="POST">
             @csrf
             
             <div class="form-group">
-                <label class="form-label">Código de Autenticación</label>
+                <label class="form-label">Código OTP (Enviado al Correo)</label>
                 <input type="text" name="code" class="form-input-code" placeholder="000000" maxlength="6" autocomplete="off" autofocus required>
             </div>
 
-            <button type="submit" class="btn-submit">
-                Verificar Identidad
+            <button type="submit" class="btn-submit" style="margin-top: 15px;">
+                Verificar y Continuar
             </button>
         </form>
 
         <div style="text-align: center; margin-top: 25px; font-size: 0.9rem;">
-            <a href="{{ route('login') }}" class="forgot-link" style="font-weight: 600;">Volver al Login</a>
-            <a href="{{ route('two-factor.recover') }}" class="forgot-link" style="display: block; margin-top: 12px; font-size: 0.82rem;">
-                <i class="fa-solid fa-mobile-screen"></i> ¿Perdió Google Authenticator? Restablecer por correo
-            </a>
-        </div>
+            <a href="{{ route('two-factor.recover') }}" class="forgot-link">¿No recibió el correo? Volver a intentar</a>
         </div>
     </div>
 

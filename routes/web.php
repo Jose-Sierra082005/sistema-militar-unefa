@@ -34,6 +34,14 @@ Route::post('/two-factor/activate', [AuthController::class, 'activateTwoFactor']
 Route::get('/two-factor/verify', [AuthController::class, 'showTwoFactorVerify'])->name('two-factor.verify');
 Route::post('/two-factor/verify', [AuthController::class, 'verifyTwoFactor']);
 
+// Rutas de Recuperación del Doble Factor (Google Authenticator perdido)
+Route::get('/two-factor/recover', [AuthController::class, 'showTwoFactorRecoverForm'])->name('two-factor.recover');
+Route::post('/two-factor/recover', [AuthController::class, 'sendTwoFactorRecoverOtp'])->name('two-factor.recover.send');
+Route::get('/two-factor/recover/verify', [AuthController::class, 'showTwoFactorRecoverVerifyForm'])->name('two-factor.recover.verify');
+Route::post('/two-factor/recover/verify', [AuthController::class, 'verifyTwoFactorRecoverOtp'])->name('two-factor.recover.verify.submit');
+Route::get('/two-factor/recover/setup', [AuthController::class, 'showTwoFactorRecoverSetup'])->name('two-factor.recover.setup');
+Route::post('/two-factor/recover/activate', [AuthController::class, 'activateTwoFactorRecover'])->name('two-factor.recover.activate');
+
 // Rutas de Recuperación de Contraseña
 Route::get('/password/forgot', [AuthController::class, 'showForgotForm'])->name('password.forgot');
 Route::post('/password/forgot', [AuthController::class, 'sendResetOtp']);

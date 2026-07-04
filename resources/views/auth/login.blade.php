@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -559,6 +559,12 @@
                     <input type="checkbox" name="remember"> Recordarme
                 </label>
                 <a href="{{ route('password.forgot') }}" class="forgot-link">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 8px;">
+                <a href="{{ route('two-factor.recover') }}" class="forgot-link" style="font-size: 0.82rem;">
+                    <i class="fa-solid fa-mobile-screen"></i> ¿Perdió su Google Authenticator?
+                </a>
             </div>
 
             <button type="submit" class="btn-submit">

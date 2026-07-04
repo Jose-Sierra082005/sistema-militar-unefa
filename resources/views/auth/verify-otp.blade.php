@@ -316,6 +316,11 @@
                     <div style="font-size: 0.72rem; color: var(--text-secondary); text-align: center; margin-top: 8px;">
                         <i class="fa-solid fa-circle-info" style="color: var(--accent-gold); margin-right: 4px;"></i> Esta cuenta cuenta con protección estricta 2FA. Ingrese el token de su celular.
                     </div>
+                    <div style="text-align: center; margin-top: 14px;">
+                        <a href="{{ route('two-factor.recover') }}" class="forgot-link" style="font-size: 0.82rem; color: var(--accent-gold);">
+                            <i class="fa-solid fa-mobile-screen"></i> ¿Sin acceso a Google Authenticator? Restablecer por correo
+                        </a>
+                    </div>
                 </div>
             @endif
 

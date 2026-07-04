@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verificación de Seguridad - Tactic Force</title>
+    <title>Restablecer Google Authenticator - Tactic Force</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,7 +53,6 @@
             position: relative;
         }
 
-        /* Tactical HUD grid overlay */
         body::before {
             content: '';
             position: absolute;
@@ -65,8 +64,26 @@
                 linear-gradient(rgba(255, 255, 255, 0.007) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.007) 1px, transparent 1px);
             background-size: 40px 40px;
+            background-position: center;
             pointer-events: none;
             z-index: 1;
+        }
+
+        .radar-sweep {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(42, 71, 51, 0.3), transparent);
+            animation: sweep 8s linear infinite;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        @keyframes sweep {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100vh); }
         }
 
         .login-card {
@@ -74,12 +91,25 @@
             max-width: 460px;
             background: var(--panel-bg);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-primary);
             border-radius: 16px;
             padding: 45px 40px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            box-shadow: 
+                0 20px 50px rgba(0, 0, 0, 0.6),
+                inset 0 0 20px rgba(42, 71, 51, 0.15);
             position: relative;
             z-index: 10;
+            overflow: hidden;
+            transition: border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .login-card:hover {
+            border-color: var(--border-glow);
+            box-shadow: 
+                0 25px 60px rgba(0, 0, 0, 0.7),
+                0 0 30px rgba(212, 175, 55, 0.05),
+                inset 0 0 25px rgba(42, 71, 51, 0.2);
         }
 
         .corner-border {
@@ -89,6 +119,11 @@
             border-color: var(--accent-gold);
             border-style: solid;
             pointer-events: none;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+        .login-card:hover .corner-border {
+            opacity: 1;
         }
         .cb-tl { top: 15px; left: 15px; border-width: 2px 0 0 2px; }
         .cb-tr { top: 15px; right: 15px; border-width: 2px 2px 0 0; }
@@ -109,6 +144,7 @@
             color: var(--accent-gold);
             margin-bottom: 25px;
             font-family: 'Share Tech Mono', monospace;
+            box-shadow: 0 0 10px rgba(42, 71, 51, 0.2);
         }
 
         .header {
@@ -128,10 +164,11 @@
             margin: 0 auto 15px auto;
             font-size: 2rem;
             color: var(--accent-gold);
+            position: relative;
         }
 
         .title {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 800;
             letter-spacing: 1.5px;
             text-transform: uppercase;
@@ -144,11 +181,12 @@
         .subtitle {
             font-size: 0.85rem;
             color: var(--text-secondary);
+            font-weight: 400;
             line-height: 1.4;
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .form-label {
@@ -156,31 +194,49 @@
             font-size: 0.75rem;
             font-weight: 600;
             color: var(--text-main);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-family: 'Share Tech Mono', monospace;
-            text-align: center;
         }
 
-        .form-input-code {
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .form-input {
             width: 100%;
             background: rgba(7, 9, 14, 0.9);
             border: 1px solid var(--border-primary);
             border-radius: 8px;
-            padding: 14px;
+            padding: 14px 15px 14px 45px;
             color: var(--text-main);
-            font-size: 1.5rem;
-            text-align: center;
-            letter-spacing: 8px;
-            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.95rem;
             outline: none;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
-        .form-input-code:focus {
+        .form-input:focus {
             border-color: var(--accent-gold);
-            box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+            box-shadow: 
+                0 0 10px rgba(212, 175, 55, 0.15),
+                inset 0 1px 3px rgba(0, 0, 0, 0.8);
+            background: #090c13;
+        }
+
+        .form-input:focus + .input-icon {
+            color: var(--accent-gold);
         }
 
         .btn-submit {
@@ -197,26 +253,16 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-submit:hover {
             border-color: var(--accent-gold);
-            box-shadow: 0 6px 20px rgba(42, 71, 51, 0.4);
-        }
-
-        .alert {
-            padding: 14px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.85rem;
-            line-height: 1.4;
-            font-weight: 500;
-        }
-
-        .alert-danger {
-            background: rgba(255, 77, 77, 0.1);
-            border: 1px solid var(--error-red);
-            color: #ff9999;
+            box-shadow: 
+                0 6px 20px rgba(42, 71, 51, 0.4),
+                0 0 10px rgba(212, 175, 55, 0.1);
         }
 
         .forgot-link {
@@ -230,6 +276,34 @@
             text-decoration: underline;
         }
 
+        .alert {
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        .alert-danger {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid var(--error-red);
+            color: #ff9999;
+        }
+
+        .footer {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 20px;
+            line-height: 1.6;
+        }
+
         @media (max-width: 480px) {
             body {
                 padding: 10px;
@@ -238,16 +312,16 @@
                 padding: 30px 20px;
                 border-radius: 12px;
             }
+            .logo-container {
+                width: 60px;
+                height: 60px;
+                font-size: 1.6rem;
+            }
             .title {
                 font-size: 1.35rem;
             }
             .subtitle {
                 font-size: 0.8rem;
-            }
-            .form-input-code {
-                font-size: 1.25rem;
-                padding: 10px;
-                letter-spacing: 4px;
             }
             .btn-submit {
                 padding: 12px;
@@ -258,7 +332,10 @@
 </head>
 <body>
 
+    <div class="radar-sweep"></div>
+
     <div class="login-card">
+        <!-- Tactical borders -->
         <div class="corner-border cb-tl"></div>
         <div class="corner-border cb-tr"></div>
         <div class="corner-border cb-bl"></div>
@@ -266,24 +343,17 @@
 
         <div style="text-align: center;">
             <div class="security-badge">
-                <i class="fa-solid fa-shield-halved"></i> Autenticación 2FA
+                <i class="fa-solid fa-mobile-screen"></i> Recuperación 2FA
             </div>
         </div>
 
         <div class="header">
             <div class="logo-container">
-                <i class="fa-solid fa-key"></i>
+                <i class="fa-solid fa-qrcode"></i>
             </div>
-            <h2 class="title">Código de Seguridad</h2>
-            <p class="subtitle">Ingrese el código temporal de 6 dígitos de su aplicación Google Authenticator</p>
+            <h2 class="title">Restablecer Authenticator</h2>
+            <p class="subtitle">Si perdió el acceso a Google Authenticator, verificaremos su identidad por correo y generará un nuevo código QR.</p>
         </div>
-
-        @if (session('error'))
-            <div class="alert alert-danger">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <span>{{ session('error') }}</span>
-            </div>
-        @endif
 
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -292,25 +362,28 @@
             </div>
         @endif
 
-        <form action="{{ route('two-factor.verify') }}" method="POST">
+        <form action="{{ route('two-factor.recover.send') }}" method="POST">
             @csrf
-            
             <div class="form-group">
-                <label class="form-label">Código de Autenticación</label>
-                <input type="text" name="code" class="form-input-code" placeholder="000000" maxlength="6" autocomplete="off" autofocus required>
+                <label class="form-label">Correo Electrónico de la Cuenta</label>
+                <div class="input-wrapper">
+                    <input type="email" name="email" class="form-input" placeholder="ej. estudiante@unefa.edu.ve" value="{{ old('email', $prefillEmail ?? '') }}" required autofocus>
+                    <i class="fa-solid fa-envelope input-icon"></i>
+                </div>
             </div>
 
             <button type="submit" class="btn-submit">
-                Verificar Identidad
+                Enviar Código OTP al Correo
             </button>
         </form>
 
         <div style="text-align: center; margin-top: 25px; font-size: 0.9rem;">
-            <a href="{{ route('login') }}" class="forgot-link" style="font-weight: 600;">Volver al Login</a>
-            <a href="{{ route('two-factor.recover') }}" class="forgot-link" style="display: block; margin-top: 12px; font-size: 0.82rem;">
-                <i class="fa-solid fa-mobile-screen"></i> ¿Perdió Google Authenticator? Restablecer por correo
-            </a>
+            <a href="{{ route('login') }}" class="forgot-link" style="font-weight: 600;"><i class="fa-solid fa-arrow-left" style="margin-right: 5px;"></i> Volver al Login</a>
+            <a href="{{ route('password.forgot') }}" class="forgot-link" style="display: block; margin-top: 12px; font-size: 0.82rem;">¿Solo olvidó su contraseña?</a>
         </div>
+
+        <div class="footer">
+            <p>&copy; 2026 Tactic Force. Todos los derechos reservados.</p>
         </div>
     </div>
 

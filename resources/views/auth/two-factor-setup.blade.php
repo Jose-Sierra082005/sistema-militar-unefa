@@ -316,8 +316,14 @@
         </div>
 
         <div class="header">
-            <h2 class="title">Configuración 2FA</h2>
-            <p class="subtitle">Vincule su cuenta con Google Authenticator para habilitar el acceso seguro</p>
+            <h2 class="title">{{ !empty($recoverMode) ? 'Restablecer 2FA' : 'Configuración 2FA' }}</h2>
+            <p class="subtitle">
+                @if(!empty($recoverMode))
+                    Escanee el nuevo código QR en Google Authenticator. El código anterior quedará invalidado.
+                @else
+                    Vincule su cuenta con Google Authenticator para habilitar el acceso seguro
+                @endif
+            </p>
         </div>
 
         @if (session('error'))
@@ -354,7 +360,7 @@
             <div class="secret-key-box">{{ $secret }}</div>
         </div>
 
-        <form action="{{ route('two-factor.activate') }}" method="POST">
+        <form action="{{ $activateRoute ?? route('two-factor.activate') }}" method="POST">
             @csrf
             <!-- We pass the secret in form to preserve it during submission validation -->
             <input type="hidden" name="secret" value="{{ $secret }}">
@@ -365,7 +371,7 @@
             </div>
 
             <button type="submit" class="btn-submit">
-                Verificar y Habilitar Acceso
+                {{ !empty($recoverMode) ? 'Confirmar Nuevo Google Authenticator' : 'Verificar y Habilitar Acceso' }}
             </button>
         </form>
     </div>
