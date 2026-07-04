@@ -23,27 +23,50 @@ class Google2FAService
      */
     public static function getQRCodeUrl($name, $email, $secret, $issuer = 'Tactic Force')
     {
-        $label = rawurlencode($issuer . ':' . $email);
-        $issuer = rawurlencode($issuer);
-        return "otpauth://totp/{$label}?secret={$secret}&issuer={$issuer}";
+        return sprintf(
+            'otpauth://totp/%s:%s?secret=%s&issuer=%s',
+            rawurlencode($issuer),
+            rawurlencode($email),
+            $secret,
+            rawurlencode($issuer)
+        );
+    }
+
+    /**
+     * URL de imagen QR lista para usar (un solo nivel de codificación).
+     */
+    public static function getQRCodeImageUrl($name, $email, $secret, $issuer = 'Tactic Force', int $size = 200): string
+    {
+        $otpauth = self::getQRCodeUrl($name, $email, $secret, $issuer);
+
+        return 'https://api.qrserver.com/v1/create-qr-code/?size=' . $size . 'x' . $size . '&data=' . rawurlencode($otpauth);
+    }
+
+    /**
+     * Normaliza el código ingresado por el usuario (solo 6 dígitos).
+     */
+    public static function normalizeCode(?string $code): string
+    {
+        return substr(preg_replace('/\D/', '', (string) $code), 0, 6);
     }
 
     /**
      * Verifies a 6-digit TOTP code against a Base32 secret.
      */
-    public static function verifyCode($secret, $code, $discrepancy = 1)
+    public static function verifyCode($secret, $code, $discrepancy = 2)
     {
-        // Clean any spaces
-        $code = str_replace(' ', '', $code);
+        $code = self::normalizeCode($code);
 
-        if (strlen($code) !== 6 || !is_numeric($code)) {
+        if (strlen($code) !== 6) {
             return false;
         }
 
-        // Get the 30-second time slice index
-        $currentTimeSlice = floor(time() / 30);
+        $secret = strtoupper(str_replace(' ', '', (string) $secret));
 
-        // Allow a slight discrepancy of steps (default 1 = ±30s)
+        // Get the 30-second time slice index
+        $currentTimeSlice = (int) floor(time() / 30);
+
+        // Allow clock skew (default ±60s)
         for ($i = -$discrepancy; $i <= $discrepancy; $i++) {
             $calculatedCode = self::getCode($secret, $currentTimeSlice + $i);
             if (hash_equals($calculatedCode, $code)) {
@@ -62,7 +85,7 @@ class Google2FAService
         $secretKey = self::base32Decode($secret);
 
         // Pack time slice into 8-byte big-endian binary string
-        $timeBin = pack('N*', 0) . pack('N*', $timeSlice);
+        $timeBin = pack('N*', 0) . pack('N*', (int) $timeSlice);
 
         // HMAC-SHA1
         $hash = hash_hmac('sha1', $timeBin, $secretKey, true);

@@ -354,10 +354,16 @@
         <div class="qr-container">
             <div class="qr-image-wrapper">
                 <!-- Google charts / QRServer API to generate QR Code safely -->
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ urlencode($qrCodeUrl) }}" alt="Escanear Código QR de 2FA">
+                <img src="{{ $qrCodeImageUrl }}" alt="Escanear Código QR de 2FA">
             </div>
             <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Clave Secreta Manual:</span>
             <div class="secret-key-box">{{ $secret }}</div>
+            @if(!empty($recoverMode))
+                <p style="font-size: 0.75rem; color: var(--accent-gold); margin-top: 12px; line-height: 1.5; text-align: center;">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Escanee este QR una sola vez. El código tiene <strong>6 dígitos</strong> (no 3). No recargue la página hasta confirmar.
+                </p>
+            @endif
         </div>
 
         <form action="{{ $activateRoute ?? route('two-factor.activate') }}" method="POST">
@@ -367,7 +373,10 @@
             
             <div class="form-group">
                 <label class="form-label">Código de Verificación de 6 Dígitos</label>
-                <input type="text" name="code" class="form-input-code" placeholder="000000" maxlength="6" autocomplete="off" required>
+                <input type="text" name="code" class="form-input-code" placeholder="000000" maxlength="6" minlength="6" inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code" required value="{{ old('code') }}">
+                <p style="font-size: 0.72rem; color: var(--text-secondary); text-align: center; margin-top: 8px;">
+                    Abra Google Authenticator y copie los <strong>6 números</strong> que aparecen para Tactic Force.
+                </p>
             </div>
 
             <button type="submit" class="btn-submit">

@@ -159,21 +159,18 @@ class AuthController extends Controller
         }
 
         $user = User::findOrFail($userId);
-        
-        // Generate new Google 2FA Secret Key
-        $secret = Google2FAService::generateSecretKey();
-        
-        // Generate QR code URI
-        $qrCodeUrl = Google2FAService::getQRCodeUrl($user->name, $user->email, $secret);
+        $secret = $this->resolvePendingTwoFactorSecret('auth.2fa.setup_secret');
 
-        return view('auth.two-factor-setup', compact('secret', 'qrCodeUrl'));
+        return $this->twoFactorSetupView($user, $secret, false, route('two-factor.activate'));
     }
 
     public function activateTwoFactor(Request $request)
     {
+        $request->merge(['code' => Google2FAService::normalizeCode($request->code)]);
+
         $request->validate([
             'secret' => 'required|string',
-            'code' => 'required|string|size:6',
+            'code' => 'required|digits:6',
         ]);
 
         $userId = session('auth.2fa.setup_user_id');
@@ -182,27 +179,25 @@ class AuthController extends Controller
         }
 
         $user = User::findOrFail($userId);
+        $secret = $request->secret;
 
-        // Verify the code input
-        $isValid = Google2FAService::verifyCode($request->secret, $request->code);
+        if (!Google2FAService::verifyCode($secret, $request->code)) {
+            session(['auth.2fa.setup_secret' => $secret]);
 
-        if ($isValid) {
-            // Update user with active 2FA
-            $user->update([
-                'two_factor_secret' => $request->secret,
-                'two_factor_enabled' => true,
-            ]);
-
-            // Login user
-            Auth::login($user);
-
-            // Clean up session
-            session()->forget('auth.2fa.setup_user_id');
-
-            return redirect()->route('dashboard')->with('success', '¡Autenticación de Doble Factor activada con éxito!');
+            return $this->twoFactorSetupView($user, $secret, false, route('two-factor.activate'))
+                ->withErrors(['code' => 'Código de verificación incorrecto. Use los 6 dígitos de Google Authenticator sin recargar la página.']);
         }
 
-        return back()->withErrors(['code' => 'Código de verificación incorrecto. Inténtelo de nuevo.']);
+        $user->update([
+            'two_factor_secret' => $secret,
+            'two_factor_enabled' => true,
+        ]);
+
+        Auth::login($user);
+
+        session()->forget(['auth.2fa.setup_user_id', 'auth.2fa.setup_secret']);
+
+        return redirect()->route('dashboard')->with('success', '¡Autenticación de Doble Factor activada con éxito!');
     }
 
     public function showTwoFactorVerify()
@@ -216,8 +211,10 @@ class AuthController extends Controller
 
     public function verifyTwoFactor(Request $request)
     {
+        $request->merge(['code' => Google2FAService::normalizeCode($request->code)]);
+
         $request->validate([
-            'code' => 'required|string|size:6',
+            'code' => 'required|digits:6',
         ]);
 
         $userId = session('auth.2fa.user_id');
@@ -509,7 +506,7 @@ class AuthController extends Controller
             '2fa.recover.otp' => $otp,
             '2fa.recover.expires' => now()->addMinutes(15)->timestamp,
         ]);
-        session()->forget('2fa.recover.verified');
+        session()->forget(['2fa.recover.verified', '2fa.recover.pending_secret']);
 
         $emailSent = \App\Services\EmailService::sendOtpEmail($user->email, $user->name, $otp);
 
@@ -571,22 +568,26 @@ class AuthController extends Controller
         }
 
         $user = User::findOrFail(session('2fa.recover.user_id'));
-        $secret = Google2FAService::generateSecretKey();
-        $qrCodeUrl = Google2FAService::getQRCodeUrl($user->name, $user->email, $secret);
+        $secret = $this->resolvePendingTwoFactorSecret('2fa.recover.pending_secret');
 
-        return view('auth.two-factor-setup', [
-            'secret' => $secret,
-            'qrCodeUrl' => $qrCodeUrl,
-            'recoverMode' => true,
-            'activateRoute' => route('two-factor.recover.activate'),
-        ]);
+        return $this->twoFactorSetupView(
+            $user,
+            $secret,
+            true,
+            route('two-factor.recover.activate')
+        );
     }
 
     public function activateTwoFactorRecover(Request $request)
     {
+        $request->merge(['code' => Google2FAService::normalizeCode($request->code)]);
+
         $request->validate([
             'secret' => 'required|string',
-            'code' => 'required|string|size:6',
+            'code' => 'required|digits:6',
+        ], [
+            'code.required' => 'El código de Google Authenticator es obligatorio.',
+            'code.digits' => 'Debe ingresar exactamente 6 dígitos numéricos de Google Authenticator.',
         ]);
 
         if (!session('2fa.recover.verified') || !session('2fa.recover.user_id')) {
@@ -594,13 +595,17 @@ class AuthController extends Controller
         }
 
         $user = User::findOrFail(session('2fa.recover.user_id'));
+        $secret = $request->secret;
 
-        if (!Google2FAService::verifyCode($request->secret, $request->code)) {
-            return back()->withErrors(['code' => 'Código de verificación incorrecto. Inténtelo de nuevo.']);
+        if (!Google2FAService::verifyCode($secret, $request->code)) {
+            session(['2fa.recover.pending_secret' => $secret]);
+
+            return $this->twoFactorSetupView($user, $secret, true, route('two-factor.recover.activate'))
+                ->withErrors(['code' => 'Código incorrecto. Ingrese los 6 dígitos actuales de Google Authenticator (no recargue la página ni escanee otro QR).']);
         }
 
         $user->update([
-            'two_factor_secret' => $request->secret,
+            'two_factor_secret' => $secret,
             'two_factor_enabled' => true,
         ]);
 
@@ -608,11 +613,35 @@ class AuthController extends Controller
             '2fa.recover.email',
             '2fa.recover.user_id',
             '2fa.recover.verified',
+            '2fa.recover.pending_secret',
             'auth.2fa.user_id',
             'auth.2fa.remember',
         ]);
 
         return redirect()->route('login')
             ->with('success', 'Google Authenticator restablecido con éxito. Use el nuevo código en su app e inicie sesión.');
+    }
+
+    private function resolvePendingTwoFactorSecret(string $sessionKey): string
+    {
+        $secret = session($sessionKey);
+
+        if (!$secret) {
+            $secret = Google2FAService::generateSecretKey();
+            session([$sessionKey => $secret]);
+        }
+
+        return $secret;
+    }
+
+    private function twoFactorSetupView(User $user, string $secret, bool $recoverMode, string $activateRoute)
+    {
+        return view('auth.two-factor-setup', [
+            'secret' => $secret,
+            'qrCodeUrl' => Google2FAService::getQRCodeUrl($user->name, $user->email, $secret),
+            'qrCodeImageUrl' => Google2FAService::getQRCodeImageUrl($user->name, $user->email, $secret),
+            'recoverMode' => $recoverMode,
+            'activateRoute' => $activateRoute,
+        ]);
     }
 }

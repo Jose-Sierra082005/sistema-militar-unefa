@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('title', 'Panel de Control - Tactic Force')
 
@@ -723,7 +723,7 @@
                         
                         <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px; background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 8px; border: 1px solid var(--border-primary); flex-wrap: wrap;">
                             <div style="background: white; padding: 6px; border-radius: 6px; margin: 0 auto;">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ urlencode($qrCodeUrl) }}" alt="QR Code" style="display: block; width: 120px; height: 120px;">
+                                <img src="{{ \App\Services\Google2FAService::getQRCodeImageUrl(auth()->user()->name, auth()->user()->email, $secret, 'Tactic Force', 120) }}" alt="QR Code" style="display: block; width: 120px; height: 120px;">
                             </div>
                             <div style="flex-grow: 1; text-align: center;">
                                 <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; display: block; margin-bottom: 4px;">Clave Secreta Manual:</span>
