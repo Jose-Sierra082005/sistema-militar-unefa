@@ -88,7 +88,7 @@ class StudentPortalController extends Controller
 
         if ($user->google_id) {
             $request->validate(['new_password' => $pwRules], $pwMessages);
-            $user->password = \Hash::make($request->new_password);
+            $user->password = $request->new_password;
             $user->save();
             return redirect()->route('student.profile.show')
                 ->with('success', 'Contrasena establecida. Ya puede iniciar sesion con su correo y contrasena.');
@@ -103,7 +103,7 @@ class StudentPortalController extends Controller
             return back()->withErrors(['current_password' => 'La contrasena actual no es correcta.'])->withInput();
         }
 
-        $user->password = \Hash::make($request->new_password);
+        $user->password = $request->new_password;
         $user->save();
 
         return redirect()->route('student.profile.show')

@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Course;
 use App\Models\Lesson;
@@ -18,20 +17,26 @@ class StudentPortalSeeder extends Seeder
         // =========================================================
         // USUARIOS
         // =========================================================
-        $admin = User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'admin@unefa.edu.ve'],
-            ['name' => 'Comandante Sierra', 'password' => Hash::make('Admin123!'), 'role' => 'admin', 'points' => 0]
+            [
+                'name' => 'Comandante Sierra',
+                'password' => 'Admin123!',
+                'role' => 'admin',
+                'points' => 0,
+                'two_factor_enabled' => false,
+                'two_factor_secret' => null,
+            ]
         );
-        if ($admin->role !== 'admin') $admin->update(['role' => 'admin']);
 
         User::firstOrCreate(
             ['email' => 'estudiante@unefa.edu.ve'],
-            ['name' => 'Cadete Jose Rodriguez', 'password' => Hash::make('Student123!'), 'role' => 'student', 'points' => 0]
+            ['name' => 'Cadete Jose Rodriguez', 'password' => 'Student123!', 'role' => 'student', 'points' => 0]
         );
 
         User::firstOrCreate(
             ['email' => 'programador082005@gmail.com'],
-            ['name' => 'Jose Sierra (Google)', 'password' => Hash::make('Student123!'), 'role' => 'student', 'points' => 0]
+            ['name' => 'Jose Sierra (Google)', 'password' => 'Student123!', 'role' => 'student', 'points' => 0]
         );
 
         $this->command->info('Usuarios verificados / creados.');

@@ -337,6 +337,28 @@ class AdminModulesTest extends TestCase
         $this->assertDatabaseMissing('courses', ['id' => $course->id]);
     }
 
+    public function test_admin_can_login_with_seeded_credentials(): void
+    {
+        User::updateOrCreate(
+            ['email' => 'admin@unefa.edu.ve'],
+            [
+                'name' => 'Comandante Sierra',
+                'password' => 'Admin123!',
+                'role' => 'admin',
+                'two_factor_enabled' => false,
+            ]
+        );
+
+        $response = $this->post(route('login'), [
+            'email'        => 'admin@unefa.edu.ve',
+            'password'     => 'Admin123!',
+            'admin_portal' => '1',
+        ]);
+
+        $response->assertRedirect('/');
+        $this->assertAuthenticatedAs(User::where('email', 'admin@unefa.edu.ve')->first());
+    }
+
     public function test_admin_login_portal_rejects_students(): void
     {
         $student = $this->createStudent();

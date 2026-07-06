@@ -61,7 +61,7 @@ class GoogleAuthController extends Controller
                         'google_id' => $googleUser->getId(),
                         'google_token' => $googleUser->token,
                         'google_refresh_token' => $googleUser->refreshToken,
-                        'password' => Hash::make(Str::random(24)),
+                        'password' => Str::random(24),
                     ]);
                 }
             }
