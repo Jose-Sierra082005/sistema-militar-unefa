@@ -302,7 +302,7 @@ class AdminModulesTest extends TestCase
         // Update lesson
         $response = $this->actingAs($user)->put(route('admin.lessons.update', $lesson->id), [
             'title'   => 'Consigna Actualizada',
-            'content' => '<p>Contenido HTML actualizado.</p>',
+            'content' => '<p>Contenido <strong>HTML</strong> actualizado.</p><script>alert(1)</script>',
             'order'   => 2,
         ]);
         $response->assertRedirect(route('admin.courses.show', $course->id));
@@ -311,6 +311,15 @@ class AdminModulesTest extends TestCase
             'title' => 'Consigna Actualizada',
             'order' => 2,
         ]);
+        $lesson->refresh();
+        $this->assertStringContainsString('<strong>HTML</strong>', $lesson->content);
+        $this->assertStringNotContainsString('<script>', $lesson->content);
+
+        // Edit views load the visual editor (Quill)
+        $response = $this->actingAs($user)->get(route('admin.lessons.edit', $lesson->id));
+        $response->assertStatus(200);
+        $response->assertSee('quill.min.js', false);
+        $response->assertSee('No necesita escribir código HTML', false);
 
         // Update question
         $response = $this->actingAs($user)->put(route('admin.questions.update', $question->id), [

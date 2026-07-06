@@ -42,7 +42,18 @@ class CourseController extends Controller
             'difficulty' => 'required|string|max:255',
         ]);
 
-        Course::create($request->all());
+        $description = $this->sanitizeRichText($request->description);
+
+        if ($description === '') {
+            return back()->withErrors(['description' => 'La descripción del curso es obligatoria.'])->withInput();
+        }
+
+        Course::create([
+            'title' => $request->title,
+            'description' => $description,
+            'category' => $request->category,
+            'difficulty' => $request->difficulty,
+        ]);
 
         return redirect()->route('admin.courses.index')->with('success', 'Curso académico militar registrado con éxito.');
     }
@@ -72,7 +83,18 @@ class CourseController extends Controller
             'difficulty' => 'required|string|max:255',
         ]);
 
-        $course->update($request->all());
+        $description = $this->sanitizeRichText($request->description);
+
+        if ($description === '') {
+            return back()->withErrors(['description' => 'La descripción del curso es obligatoria.'])->withInput();
+        }
+
+        $course->update([
+            'title' => $request->title,
+            'description' => $description,
+            'category' => $request->category,
+            'difficulty' => $request->difficulty,
+        ]);
 
         return redirect()->route('admin.courses.index')->with('success', 'Curso académico actualizado con éxito.');
     }
@@ -96,7 +118,17 @@ class CourseController extends Controller
             'order' => 'required|integer|min:0',
         ]);
 
-        $course->lessons()->create($request->all());
+        $content = $this->sanitizeRichText($request->content, allowHeadings: true);
+
+        if ($content === '') {
+            return back()->withErrors(['content' => 'El contenido de la lección es obligatorio.'])->withInput();
+        }
+
+        $course->lessons()->create([
+            'title' => $request->title,
+            'content' => $content,
+            'order' => $request->order,
+        ]);
 
         return redirect()->route('admin.courses.show', $course->id)->with('success', 'Nueva lección teórica/táctica agregada al curso.');
     }
@@ -127,7 +159,17 @@ class CourseController extends Controller
             'order' => 'required|integer|min:0',
         ]);
 
-        $lesson->update($request->only(['title', 'content', 'order']));
+        $content = $this->sanitizeRichText($request->content, allowHeadings: true);
+
+        if ($content === '') {
+            return back()->withErrors(['content' => 'El contenido de la lección es obligatorio.'])->withInput();
+        }
+
+        $lesson->update([
+            'title' => $request->title,
+            'content' => $content,
+            'order' => $request->order,
+        ]);
 
         return redirect()->route('admin.courses.show', $lesson->course_id)
             ->with('success', 'Lección actualizada correctamente.');
@@ -204,5 +246,17 @@ class CourseController extends Controller
         $question->delete();
 
         return redirect()->route('admin.courses.show', $courseId)->with('success', 'Pregunta eliminada con éxito del cuestionario.');
+    }
+
+    private function sanitizeRichText(?string $html, bool $allowHeadings = false): string
+    {
+        $allowed = $allowHeadings
+            ? '<p><br><strong><em><u><h3><ul><ol><li>'
+            : '<p><br><strong><em><u><ul><ol><li>';
+
+        $clean = strip_tags($html ?? '', $allowed);
+        $plain = trim(html_entity_decode(strip_tags($clean)));
+
+        return $plain === '' ? '' : $clean;
     }
 }

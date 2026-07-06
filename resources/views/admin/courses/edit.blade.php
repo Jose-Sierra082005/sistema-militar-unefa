@@ -60,7 +60,15 @@
 
                 <div class="form-group">
                     <label class="form-label">Descripción General / Sinopsis</label>
-                    <textarea name="description" class="form-input" rows="4" required style="resize: none;">{{ old('description', $course->description) }}</textarea>
+                    @include('admin.partials.rich_editor', [
+                        'id' => 'course-description',
+                        'name' => 'description',
+                        'value' => old('description', $course->description),
+                        'label' => null,
+                        'mode' => 'basic',
+                        'minHeight' => '160px',
+                        'placeholder' => 'Describa brevemente los objetivos de aprendizaje y competencias del curso...',
+                    ])
                 </div>
 
                 <button type="submit" class="btn-tactical" style="margin-top: 10px;">

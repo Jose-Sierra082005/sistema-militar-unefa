@@ -37,13 +37,6 @@
         margin-left: 20px;
         margin-bottom: 14px;
     }
-
-    .html-hint {
-        font-size: 0.78rem;
-        color: var(--text-secondary);
-        margin-top: 8px;
-        line-height: 1.45;
-    }
 </style>
 @endsection
 
@@ -90,17 +83,17 @@
                         <input type="number" name="order" class="form-input" min="0" value="{{ old('order', $lesson->order) }}" required style="font-family: 'Share Tech Mono', monospace; max-width: 140px;">
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Contenido Teórico / Táctico</label>
-                        <textarea name="content" id="lesson-content" class="form-input" rows="16" required style="resize: vertical; font-size: 0.88rem; line-height: 1.5;">{{ old('content', $lesson->content) }}</textarea>
-                        <p class="html-hint">
-                            <i class="fa-solid fa-circle-info" style="color: var(--accent-gold);"></i>
-                            Puede usar HTML básico: <code>&lt;p&gt;</code>, <code>&lt;h3&gt;</code>, <code>&lt;ul&gt;</code>, <code>&lt;li&gt;</code>, <code>&lt;strong&gt;</code>.
-                            Así se verá igual que en el portal del estudiante.
-                        </p>
-                    </div>
+                    @include('admin.partials.rich_editor', [
+                        'id' => 'lesson-content',
+                        'name' => 'content',
+                        'value' => old('content', $lesson->content),
+                        'label' => 'Contenido Teórico / Táctico',
+                        'mode' => 'full',
+                        'minHeight' => '320px',
+                        'placeholder' => 'Redacte la lección usando títulos, listas y negritas desde la barra superior...',
+                    ])
 
-                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;">
                         <button type="submit" class="btn-tactical">
                             <i class="fa-solid fa-save"></i> Guardar Cambios
                         </button>
@@ -127,19 +120,28 @@
             </div>
         </div>
     </form>
+@endsection
 
-    <script>
-        const titleInput = document.getElementById('lesson-title');
-        const contentInput = document.getElementById('lesson-content');
-        const previewTitle = document.getElementById('preview-title');
-        const previewBody = document.getElementById('preview-body');
+@section('scripts')
+<script>
+    const titleInput = document.getElementById('lesson-title');
+    const previewTitle = document.getElementById('preview-title');
+    const previewBody = document.getElementById('preview-body');
 
-        function refreshPreview() {
-            previewTitle.textContent = titleInput.value || 'Sin título';
-            previewBody.innerHTML = contentInput.value || '<p style="color: var(--text-secondary);">Escriba contenido para ver la vista previa.</p>';
-        }
+    function refreshPreview() {
+        previewTitle.textContent = titleInput.value || 'Sin título';
+        const editor = window.__richEditors && window.__richEditors['lesson-content'];
+        const html = editor ? editor.root.innerHTML : (document.getElementById('lesson-content')?.value || '');
+        const isEmpty = editor ? editor.getText().trim() === '' : !html.trim();
+        previewBody.innerHTML = isEmpty
+            ? '<p style="color: var(--text-secondary);">Escriba contenido para ver la vista previa.</p>'
+            : html;
+    }
 
-        titleInput.addEventListener('input', refreshPreview);
-        contentInput.addEventListener('input', refreshPreview);
-    </script>
+    titleInput.addEventListener('input', refreshPreview);
+    document.addEventListener('rich-editor:change', (e) => {
+        if (e.detail.id === 'lesson-content') refreshPreview();
+    });
+    document.addEventListener('DOMContentLoaded', () => setTimeout(refreshPreview, 100));
+</script>
 @endsection

@@ -279,7 +279,7 @@
                     </div>
                     
                     <div class="course-body-student">
-                        <p class="course-description-student">{{ $course->description }}</p>
+                        <p class="course-description-student">{{ Str::limit(strip_tags($course->description), 140) }}</p>
                         
                         <div class="progress-bar-container-student">
                             <div class="progress-text-student">

@@ -71,7 +71,7 @@
                                     {{ $course->title }}
                                 </td>
                                 <td style="color: var(--text-secondary); font-size: 0.85rem; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    {{ $course->description }}
+                                    {{ Str::limit(strip_tags($course->description), 120) }}
                                 </td>
                                 <td>
                                     <span style="font-family: 'Share Tech Mono', monospace; color: var(--accent-gold);">

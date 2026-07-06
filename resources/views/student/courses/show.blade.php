@@ -267,7 +267,7 @@
                 <div class="panel-body" style="font-size: 0.9rem; line-height: 1.5; color: var(--text-secondary); display: flex; flex-direction: column; gap: 15px;">
                     <div>
                         <strong style="color: var(--text-main);">Sinopsis:</strong>
-                        <p style="margin-top: 4px; font-size: 0.85rem;">{{ $course->description }}</p>
+                        <p style="margin-top: 4px; font-size: 0.85rem;">{!! $course->description !!}</p>
                     </div>
                     
                     <div style="border-top: 1px dashed rgba(46, 74, 53, 0.25); padding-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">

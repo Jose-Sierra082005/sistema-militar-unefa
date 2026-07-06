@@ -141,7 +141,7 @@
                 <span class="badge-status {{ strtolower($course->difficulty) == 'avanzado' ? 'badge-status-red' : (strtolower($course->difficulty) == 'intermedio' ? 'badge-status-orange' : 'badge-status-green') }}" style="margin-bottom: 8px; margin-left: 8px;">
                     Dificultad: {{ $course->difficulty }}
                 </span>
-                <p style="color: var(--text-main); font-size: 0.95rem; margin-top: 10px; line-height: 1.5;">{{ $course->description }}</p>
+                <p style="color: var(--text-main); font-size: 0.95rem; margin-top: 10px; line-height: 1.5;">{!! $course->description !!}</p>
             </div>
             <div style="text-align: right; min-width: 150px; font-family: 'Share Tech Mono', monospace;">
                 <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase;">Total Lecciones</div>
@@ -329,7 +329,15 @@
 
                     <div class="form-group">
                         <label class="form-label">Contenido Táctico / Teórico</label>
-                        <textarea name="content" class="form-input" rows="8" placeholder="Redacte el contenido oficial de la lección. Puede estructurar el texto utilizando guiones, párrafos y pasos procedurales..." required style="resize: none; font-size: 0.85rem; line-height: 1.4; font-family: sans-serif;"></textarea>
+                        @include('admin.partials.rich_editor', [
+                            'id' => 'new-lesson-content',
+                            'name' => 'content',
+                            'value' => old('content'),
+                            'label' => null,
+                            'mode' => 'full',
+                            'minHeight' => '220px',
+                            'placeholder' => 'Redacte el contenido de la nueva lección...',
+                        ])
                     </div>
 
                     <button type="submit" class="btn-tactical" style="width: 100%; justify-content: center; margin-top: 10px;">
