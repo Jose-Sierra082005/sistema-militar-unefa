@@ -448,45 +448,12 @@
     <div class="kpi-grid">
         <div class="kpi-card">
             <div class="kpi-header">
-                <span>Efectivos</span>
-                <div class="kpi-icon"><i class="fa-solid fa-user-shield"></i></div>
+                <span>Estudiantes</span>
+                <div class="kpi-icon"><i class="fa-solid fa-user-graduate"></i></div>
             </div>
-            <div class="kpi-value">142</div>
-            <div class="kpi-trend trend-up">
-                <i class="fa-solid fa-arrow-trend-up"></i> <span>+4% (Esta Semana)</span>
-            </div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span>Parque de Armas</span>
-                <div class="kpi-icon"><i class="fa-solid fa-shield-halved"></i></div>
-            </div>
-            <div class="kpi-value">100%</div>
-            <div class="kpi-trend trend-up">
-                <i class="fa-solid fa-circle-check"></i> <span>Asegurado</span>
-            </div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span>Roles de Guardia</span>
-                <div class="kpi-icon"><i class="fa-solid fa-clock"></i></div>
-            </div>
-            <div class="kpi-value">8 Activos</div>
+            <div class="kpi-value">{{ $studentCount }}</div>
             <div class="kpi-trend trend-neutral">
-                <i class="fa-solid fa-circle-dot"></i> <span>Turno Alfa</span>
-            </div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span>Base de Datos</span>
-                <div class="kpi-icon"><i class="fa-solid fa-database"></i></div>
-            </div>
-            <div class="kpi-value">Aiven Cloud</div>
-            <div class="kpi-trend trend-up">
-                <i class="fa-solid fa-signal"></i> <span>En Línea (SSL)</span>
+                <i class="fa-solid fa-users"></i> <span>Registrados en el portal</span>
             </div>
         </div>
     </div>
@@ -531,26 +498,6 @@
                     <!-- Module 3 -->
                     <div class="module-card">
                         <div class="module-header">
-                            <span class="module-title">Manual de Armamento</span>
-                            <span class="module-badge badge-active">Activo</span>
-                        </div>
-                        <p class="module-desc">Biblioteca y manual técnico de consulta sobre armamento reglamentario, calibres y conservación de equipos.</p>
-                        <a href="{{ route('admin.armory.index') }}" class="module-action">Ingresar <i class="fa-solid fa-arrow-right"></i></a>
-                    </div>
-
-                    <!-- Module 4 -->
-                    <div class="module-card">
-                        <div class="module-header">
-                            <span class="module-title">Procedimientos de Guardia</span>
-                            <span class="module-badge badge-active">Activo</span>
-                        </div>
-                        <p class="module-desc">Planificación de simulaciones de puestos de guardia y manual de procedimientos de seguridad para centinelas.</p>
-                        <a href="{{ route('admin.guards.index') }}" class="module-action">Ingresar <i class="fa-solid fa-arrow-right"></i></a>
-                    </div>
-
-                    <!-- Module 5 -->
-                    <div class="module-card">
-                        <div class="module-header">
                             <span class="module-title">Evaluaciones y Notas</span>
                             <span class="module-badge badge-active">Activo</span>
                         </div>
@@ -564,45 +511,33 @@
         <!-- Column 2: Tactical Widget & Diagnostic Log -->
         <div style="display: flex; flex-direction: column; gap: 32px;">
             
-            <!-- Radar Scan Widget -->
+            <!-- Resumen Académico -->
             <div class="panel">
                 <div class="panel-header-bar">
                     <div class="panel-title">
-                        <i class="fa-solid fa-crosshairs"></i>
-                        <span>Radar Táctico Falcón</span>
+                        <i class="fa-solid fa-chart-simple"></i>
+                        <span>Resumen Académico</span>
                     </div>
                 </div>
                 <div class="panel-body">
-                    <div class="radar-widget-container">
-                        <div class="radar-screen">
-                            <div class="radar-sweep"></div>
-                            <div class="radar-grid-circle c1"></div>
-                            <div class="radar-grid-circle c2"></div>
-                            <div class="radar-grid-circle c3"></div>
-                            <div class="radar-crosshair-h"></div>
-                            <div class="radar-crosshair-v"></div>
-                            <div class="radar-blip b1"></div>
-                            <div class="radar-blip b2"></div>
+                    <div class="progress-indicator">
+                        <div class="progress-label-bar">
+                            <span>Cursos Activos</span>
+                            <span>{{ $courseCount }}</span>
                         </div>
-                        
-                        <div class="progress-indicator">
-                            <div class="progress-label-bar">
-                                <span>Capacidad Armería Principal</span>
-                                <span>88%</span>
-                            </div>
-                            <div class="progress-track">
-                                <div class="progress-fill fill-gold" style="width: 88%;"></div>
-                            </div>
-                        </div>
+                    </div>
 
-                        <div class="progress-indicator">
-                            <div class="progress-label-bar">
-                                <span>Disponibilidad Tropa Activa</span>
-                                <span>94%</span>
-                            </div>
-                            <div class="progress-track">
-                                <div class="progress-fill fill-green" style="width: 94%;"></div>
-                            </div>
+                    <div class="progress-indicator">
+                        <div class="progress-label-bar">
+                            <span>Lecciones en Temarios</span>
+                            <span>{{ $lessonCount }}</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-indicator">
+                        <div class="progress-label-bar">
+                            <span>Estudiantes Registrados</span>
+                            <span>{{ $studentCount }}</span>
                         </div>
                     </div>
                 </div>
@@ -619,24 +554,19 @@
                 <div class="panel-body" style="max-height: 250px; overflow-y: auto;">
                     <ul class="activity-log">
                         <li class="activity-item">
-                            <div class="activity-time">16:13:50</div>
+                            <div class="activity-time">{{ now()->format('H:i:s') }}</div>
                             <div class="activity-icon"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
                             <div class="activity-text">Usuario <strong>{{ auth()->user()->name }}</strong> inició sesión con éxito.</div>
                         </li>
                         <li class="activity-item">
-                            <div class="activity-time">16:11:02</div>
-                            <div class="activity-icon"><i class="fa-solid fa-server"></i></div>
-                            <div class="activity-text">Sincronización con base de datos <strong>MySQL Aiven</strong> en línea.</div>
-                        </li>
-                        <li class="activity-item">
-                            <div class="activity-time">15:58:12</div>
+                            <div class="activity-time">{{ now()->subMinutes(2)->format('H:i:s') }}</div>
                             <div class="activity-icon"><i class="fa-solid fa-circle-check"></i></div>
-                            <div class="activity-text">Verificación de IP en cortafuegos completado exitosamente.</div>
+                            <div class="activity-text">Sistema <strong>Tactic Force</strong> operacional.</div>
                         </li>
                         <li class="activity-item">
-                            <div class="activity-time">15:30:00</div>
-                            <div class="activity-icon"><i class="fa-solid fa-rotate"></i></div>
-                            <div class="activity-text">Reinicio automático del servicio PHP Artisan en Render.</div>
+                            <div class="activity-time">{{ now()->subMinutes(15)->format('H:i:s') }}</div>
+                            <div class="activity-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                            <div class="activity-text"><strong>{{ $courseCount }}</strong> cursos y <strong>{{ $lessonCount }}</strong> lecciones disponibles en el LMS.</div>
                         </li>
                     </ul>
                 </div>
@@ -644,108 +574,5 @@
 
         </div>
 
-    </div>
-
-    <!-- Panel de Seguridad (Obligatorio para Perfiles Incompletos) -->
-    <div class="panel" style="margin-top: 32px;" id="seccion-seguridad">
-        <div class="panel-header-bar">
-            <div class="panel-title">
-                <i class="fa-solid fa-user-lock"></i>
-                <span>Ajustes de Seguridad y Doble Factor (2FA)</span>
-            </div>
-        </div>
-        <div class="panel-body">
-            @if ($errors->any())
-                <div class="alert alert-danger" style="margin-bottom: 20px;">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                    <span>{{ $errors->first() }}</span>
-                </div>
-            @endif
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px;">
-                
-                <!-- Formulario de Datos Básicos -->
-                <div>
-                    <h3 style="color: var(--accent-gold); font-size: 1.1rem; margin-bottom: 15px; font-family: 'Share Tech Mono', monospace; text-transform: uppercase;">
-                        <i class="fa-solid fa-id-card" style="margin-right: 8px;"></i>Datos del Perfil
-                    </h3>
-                    <form action="{{ route('security.update') }}" method="POST">
-                        @csrf
-                        <div style="margin-bottom: 15px;">
-                            <label class="form-label" style="text-align: left; margin-bottom: 6px;">Cédula de Identidad</label>
-                            @if(empty(auth()->user()->cedula))
-                                <input type="text" name="cedula" class="form-input" placeholder="ej. V-31149881 o 31149881" required>
-                                <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 5px;">Requerida para validez oficial en Tactic Force.</span>
-                            @else
-                                <input type="text" class="form-input" value="{{ auth()->user()->cedula }}" disabled style="opacity: 0.6; cursor: not-allowed;">
-                                <span style="font-size: 0.75rem; color: var(--success-green); display: block; margin-top: 5px;">Cédula registrada y verificada con éxito.</span>
-                            @endif
-                        </div>
-
-                        <div style="margin-bottom: 15px;">
-                            <label class="form-label" style="text-align: left; margin-bottom: 6px;">Establecer/Cambiar Contraseña</label>
-                            <input type="password" name="password" class="form-input" placeholder="Nueva Contraseña" style="margin-bottom: 10px;">
-                            <input type="password" name="password_confirmation" class="form-input" placeholder="Confirmar Nueva Contraseña">
-                            <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 5px; line-height: 1.3;">
-                                Mínimo 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un símbolo especial.
-                            </span>
-                        </div>
-
-                        <button type="submit" class="btn-tactical" style="width: auto;">
-                            Guardar Cambios de Perfil
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Configuración de Doble Factor (2FA) -->
-                <div>
-                    <h3 style="color: var(--accent-gold); font-size: 1.1rem; margin-bottom: 15px; font-family: 'Share Tech Mono', monospace; text-transform: uppercase;">
-                        <i class="fa-solid fa-key" style="margin-right: 8px;"></i>Doble Factor (Google Authenticator)
-                    </h3>
-                    
-                    @if(auth()->user()->two_factor_enabled && !empty(auth()->user()->two_factor_secret))
-                        <div style="background: rgba(46, 204, 113, 0.1); border: 1px solid var(--success-green); border-radius: 8px; padding: 20px; display: flex; align-items: center; gap: 15px;">
-                            <i class="fa-solid fa-circle-check" style="font-size: 2.5rem; color: var(--success-green);"></i>
-                            <div>
-                                <h4 style="color: var(--text-main); font-weight: 700; margin-bottom: 4px;">Doble Factor Activo</h4>
-                                <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4;">Su cuenta está protegida por Google Authenticator. Se solicitará el código de 6 dígitos en cada inicio de sesión.</p>
-                            </div>
-                        </div>
-                    @else
-                        @php
-                            $secret = \App\Services\Google2FAService::generateSecretKey();
-                            $qrCodeUrl = \App\Services\Google2FAService::getQRCodeUrl(auth()->user()->name, auth()->user()->email, $secret);
-                        @endphp
-                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4; margin-bottom: 15px;">
-                            1. Escanee el código QR con su aplicación Google Authenticator.<br>
-                            2. Ingrese el código temporal de 6 dígitos que aparezca en su aplicación para activar.
-                        </p>
-                        
-                        <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px; background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 8px; border: 1px solid var(--border-primary); flex-wrap: wrap;">
-                            <div style="background: white; padding: 6px; border-radius: 6px; margin: 0 auto;">
-                                <img src="{{ \App\Services\Google2FAService::getQRCodeImageUrl(auth()->user()->name, auth()->user()->email, $secret, 'Tactic Force', 120) }}" alt="QR Code" style="display: block; width: 120px; height: 120px;">
-                            </div>
-                            <div style="flex-grow: 1; text-align: center;">
-                                <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; display: block; margin-bottom: 4px;">Clave Secreta Manual:</span>
-                                <code style="font-family: 'Share Tech Mono', monospace; color: var(--accent-gold-hover); font-size: 1rem; font-weight: 700; letter-spacing: 1.5px; word-break: break-all;">{{ $secret }}</code>
-                            </div>
-                        </div>
-
-                        <form action="{{ route('security.2fa-activate') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="secret" value="{{ $secret }}">
-                            <div style="margin-bottom: 15px;">
-                                <label class="form-label" style="text-align: left; margin-bottom: 6px;">Código de Verificación (6 dígitos)</label>
-                                <input type="text" name="code" class="form-input" placeholder="000000" maxlength="6" autocomplete="off" required style="font-family: 'Share Tech Mono', monospace; font-size: 1.2rem; letter-spacing: 4px; text-align: center;">
-                            </div>
-                            <button type="submit" class="btn-tactical" style="width: auto;">
-                                Activar Doble Factor
-                            </button>
-                        </form>
-                    @endif
-                </div>
-
-            </div>
-        </div>
     </div>
 @endsection

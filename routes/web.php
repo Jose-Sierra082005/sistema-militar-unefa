@@ -11,10 +11,17 @@ use App\Http\Controllers\GuardDutyController;
 use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\StudentPortalController;
+use App\Models\User;
+use App\Models\Course;
+use App\Models\Lesson;
 
 Route::get('/', function () {
     if (auth()->check() && auth()->user()->role === 'admin') {
-        return view('dashboard');
+        $studentCount = User::where('role', 'student')->count();
+        $courseCount = Course::count();
+        $lessonCount = Lesson::count();
+
+        return view('dashboard', compact('studentCount', 'courseCount', 'lessonCount'));
     }
     return redirect()->route('student.dashboard');
 })->middleware('auth')->name('dashboard');
