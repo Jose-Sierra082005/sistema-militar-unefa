@@ -7,6 +7,9 @@
         <a href="{{ route('admin.courses.index') }}" class="btn-tactical btn-tactical-gold" style="padding: 6px 12px; font-size: 0.8rem; margin-bottom: 10px;">
             <i class="fa-solid fa-arrow-left"></i> Volver al Listado
         </a>
+        <a href="{{ route('admin.courses.show', $course->id) }}" class="btn-tactical btn-tactical-gold" style="padding: 6px 12px; font-size: 0.8rem; margin-left: 8px;">
+            <i class="fa-solid fa-book-open"></i> Ver Temario
+        </a>
         <h2 style="font-family: 'Share Tech Mono', monospace; font-size: 1.8rem; text-transform: uppercase; color: var(--accent-gold); letter-spacing: 1px; margin-top: 10px;">
             Editar Curso Militar
         </h2>
@@ -42,15 +45,7 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div class="form-group">
                         <label class="form-label">Categoría Académica</label>
-                        <select name="category" class="form-select" required>
-                            <option value="Tácticas de Combate" {{ $course->category == 'Tácticas de Combate' ? 'selected' : '' }}>Tácticas de Combate</option>
-                            <option value="Armamento y Tiro" {{ $course->category == 'Armamento y Tiro' ? 'selected' : '' }}>Armamento y Tiro</option>
-                            <option value="Supervivencia y Evasión" {{ $course->category == 'Supervivencia y Evasión' ? 'selected' : '' }}>Supervivencia y Evasión</option>
-                            <option value="Navegación Terrestre" {{ $course->category == 'Navegación Terrestre' ? 'selected' : '' }}>Navegación Terrestre</option>
-                            <option value="Primeros Auxilios Militares" {{ $course->category == 'Primeros Auxilios Militares' ? 'selected' : '' }}>Primeros Auxilios Militares</option>
-                            <option value="Liderazgo y Estrategia" {{ $course->category == 'Liderazgo y Estrategia' ? 'selected' : '' }}>Liderazgo y Estrategia</option>
-                            <option value="Orden Cerrado y Disciplina" {{ $course->category == 'Orden Cerrado y Disciplina' ? 'selected' : '' }}>Orden Cerrado y Disciplina</option>
-                        </select>
+                        @include('admin.partials.category_select', ['selected' => $course->category])
                     </div>
 
                     <div class="form-group">

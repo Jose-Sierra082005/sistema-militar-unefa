@@ -812,10 +812,12 @@
                 <div class="user-details">
                     <div class="user-name">{{ auth()->user()->name }}</div>
                     <div class="user-role">
-                        @if(auth()->user()->google_id)
+                        @if(auth()->user()->role === 'admin')
+                            <i class="fa-solid fa-user-shield" style="margin-right: 4px; font-size: 0.75rem; color: var(--accent-gold);"></i>Administrador
+                        @elseif(auth()->user()->google_id)
                             <i class="fa-brands fa-google" style="margin-right: 4px; font-size: 0.75rem;"></i>Google Auth
                         @else
-                            Oficial de Turno
+                            Cadete / Estudiante
                         @endif
                     </div>
                 </div>

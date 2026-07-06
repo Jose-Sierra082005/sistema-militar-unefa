@@ -89,7 +89,7 @@
                                 </td>
                                 <td style="text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; font-weight: 700;">
                                     <span style="background: rgba(42, 71, 51, 0.3); border: 1px dashed var(--border-primary); padding: 2px 10px; border-radius: 4px;">
-                                        {{ $course->lessons->count() }} Lección(es)
+                                        {{ $course->lessons_count ?? $course->lessons->count() }} Lección(es)
                                     </span>
                                 </td>
                                 <td style="text-align: center;">

@@ -12,7 +12,12 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        return view('auth.login');
+        return view('auth.login', ['adminPortal' => false]);
+    }
+
+    public function showAdminLoginForm()
+    {
+        return view('auth.login', ['adminPortal' => true]);
     }
 
     public function login(Request $request)
@@ -41,6 +46,12 @@ class AuthController extends Controller
             ->first();
 
         if ($user && Hash::check($request->password, $user->password)) {
+            if ($request->boolean('admin_portal') && $user->role !== 'admin') {
+                return back()->withErrors([
+                    'email' => 'Este acceso es exclusivo para administradores. Use el portal de estudiantes.',
+                ])->withInput($request->only('email'));
+            }
+
             // Check if user has Two-Factor Authentication enabled
             if ($user->two_factor_enabled && !empty($user->two_factor_secret)) {
                 // Save user ID temporarily in session

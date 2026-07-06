@@ -51,6 +51,7 @@ Route::get('/password/reset', [AuthController::class, 'showResetForm'])->name('p
 Route::post('/password/reset', [AuthController::class, 'resetPassword']);
 
 // Rutas de demostración del login para el pipeline CI/CD en Render
+Route::get('/admin/login', [AuthController::class, 'showAdminLoginForm'])->name('admin.login');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -95,10 +96,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('/courses/{id}', [CourseController::class, 'destroy'])->name('courses.destroy');
 
     // Lecciones del LMS
+    Route::get('/lessons/{id}/edit', [CourseController::class, 'editLesson'])->name('lessons.edit');
+    Route::put('/lessons/{id}', [CourseController::class, 'updateLesson'])->name('lessons.update');
     Route::post('/courses/{course_id}/lessons', [CourseController::class, 'storeLesson'])->name('lessons.store');
     Route::delete('/lessons/{id}', [CourseController::class, 'destroyLesson'])->name('lessons.destroy');
 
     // Cuestionarios del LMS
+    Route::get('/questions/{id}/edit', [CourseController::class, 'editQuestion'])->name('questions.edit');
+    Route::put('/questions/{id}', [CourseController::class, 'updateQuestion'])->name('questions.update');
     Route::post('/lessons/{lesson_id}/questions', [CourseController::class, 'storeQuestion'])->name('questions.store');
     Route::delete('/questions/{id}', [CourseController::class, 'destroyQuestion'])->name('questions.destroy');
 

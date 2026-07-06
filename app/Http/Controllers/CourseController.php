@@ -23,7 +23,7 @@ class CourseController extends Controller
             });
         }
 
-        $courses = $query->orderBy('title', 'asc')->paginate(10);
+        $courses = $query->withCount('lessons')->orderBy('title', 'asc')->paginate(10);
 
         return view('admin.courses.index', compact('courses'));
     }
@@ -108,6 +108,64 @@ class CourseController extends Controller
         $lesson->delete();
 
         return redirect()->route('admin.courses.show', $courseId)->with('success', 'Lección eliminada de la planificación del curso.');
+    }
+
+    public function editLesson($id)
+    {
+        $lesson = Lesson::with('course')->findOrFail($id);
+
+        return view('admin.lessons.edit', compact('lesson'));
+    }
+
+    public function updateLesson(Request $request, $id)
+    {
+        $lesson = Lesson::findOrFail($id);
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'order' => 'required|integer|min:0',
+        ]);
+
+        $lesson->update($request->only(['title', 'content', 'order']));
+
+        return redirect()->route('admin.courses.show', $lesson->course_id)
+            ->with('success', 'Lección actualizada correctamente.');
+    }
+
+    public function editQuestion($id)
+    {
+        $question = Question::with(['lesson.course', 'options' => fn ($q) => $q->orderBy('id')])->findOrFail($id);
+
+        return view('admin.questions.edit', compact('question'));
+    }
+
+    public function updateQuestion(Request $request, $id)
+    {
+        $question = Question::with(['options' => fn ($q) => $q->orderBy('id')])->findOrFail($id);
+
+        $request->validate([
+            'question_text' => 'required|string',
+            'points' => 'required|integer|min:1|max:100',
+            'options' => 'required|array|size:4',
+            'options.*' => 'required|string|max:500',
+            'correct_option' => 'required|integer|between:0,3',
+        ]);
+
+        $question->update([
+            'question_text' => $request->question_text,
+            'points' => $request->points,
+        ]);
+
+        foreach ($question->options as $index => $option) {
+            $option->update([
+                'option_text' => $request->options[$index],
+                'is_correct' => ($index == $request->correct_option),
+            ]);
+        }
+
+        return redirect()->route('admin.courses.show', $question->lesson->course_id)
+            ->with('success', 'Pregunta del cuestionario actualizada correctamente.');
     }
 
     public function storeQuestion(Request $request, $lesson_id)

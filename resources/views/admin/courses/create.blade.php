@@ -41,16 +41,7 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div class="form-group">
                         <label class="form-label">Categoría Académica</label>
-                        <select name="category" class="form-select" required>
-                            <option value="" disabled selected>Seleccione Categoría</option>
-                            <option value="Tácticas de Combate">Tácticas de Combate</option>
-                            <option value="Armamento y Tiro">Armamento y Tiro</option>
-                            <option value="Supervivencia y Evasión">Supervivencia y Evasión</option>
-                            <option value="Navegación Terrestre">Navegación Terrestre</option>
-                            <option value="Primeros Auxilios Militares">Primeros Auxilios Militares</option>
-                            <option value="Liderazgo y Estrategia">Liderazgo y Estrategia</option>
-                            <option value="Orden Cerrado y Disciplina">Orden Cerrado y Disciplina</option>
-                        </select>
+                        @include('admin.partials.category_select')
                     </div>
 
                     <div class="form-group">

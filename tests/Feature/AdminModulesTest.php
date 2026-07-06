@@ -297,6 +297,35 @@ class AdminModulesTest extends TestCase
             'question_text' => '¿Qué es la consigna?',
         ]);
 
+        $question = Question::where('lesson_id', $lesson->id)->first();
+
+        // Update lesson
+        $response = $this->actingAs($user)->put(route('admin.lessons.update', $lesson->id), [
+            'title'   => 'Consigna Actualizada',
+            'content' => '<p>Contenido HTML actualizado.</p>',
+            'order'   => 2,
+        ]);
+        $response->assertRedirect(route('admin.courses.show', $course->id));
+        $this->assertDatabaseHas('lessons', [
+            'id'    => $lesson->id,
+            'title' => 'Consigna Actualizada',
+            'order' => 2,
+        ]);
+
+        // Update question
+        $response = $this->actingAs($user)->put(route('admin.questions.update', $question->id), [
+            'question_text'  => '¿Cuál es la consigna reglamentaria?',
+            'points'         => 20,
+            'options'        => ['Norma del centinela', 'Un arma', 'Un puesto', 'Un relevo'],
+            'correct_option' => 0,
+        ]);
+        $response->assertRedirect(route('admin.courses.show', $course->id));
+        $this->assertDatabaseHas('questions', [
+            'id'            => $question->id,
+            'question_text' => '¿Cuál es la consigna reglamentaria?',
+            'points'        => 20,
+        ]);
+
         // Delete lesson
         $response = $this->actingAs($user)->delete(route('admin.lessons.destroy', $lesson->id));
         $response->assertRedirect(route('admin.courses.show', $course->id));
@@ -306,6 +335,27 @@ class AdminModulesTest extends TestCase
         $response = $this->actingAs($user)->delete(route('admin.courses.destroy', $course->id));
         $response->assertRedirect(route('admin.courses.index'));
         $this->assertDatabaseMissing('courses', ['id' => $course->id]);
+    }
+
+    public function test_admin_login_portal_rejects_students(): void
+    {
+        $student = $this->createStudent();
+
+        $response = $this->post(route('login'), [
+            'email'        => $student->email,
+            'password'     => 'Student123!',
+            'admin_portal' => '1',
+        ]);
+
+        $response->assertSessionHasErrors('email');
+        $this->assertGuest();
+    }
+
+    public function test_admin_login_page_can_be_rendered(): void
+    {
+        $response = $this->get(route('admin.login'));
+        $response->assertStatus(200);
+        $response->assertSee('Portal Administrador');
     }
 
     // ══════════════════════════════════════════════════════════════════

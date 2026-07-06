@@ -102,16 +102,21 @@
 @endsection
 
 @section('content')
-    <div style="margin-bottom: 20px;">
-        <a href="{{ route('admin.courses.index') }}" class="btn-tactical btn-tactical-gold" style="padding: 6px 12px; font-size: 0.8rem; margin-bottom: 10px;">
-            <i class="fa-solid fa-arrow-left"></i> Volver a los Cursos
+    <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+        <div>
+            <a href="{{ route('admin.courses.index') }}" class="btn-tactical btn-tactical-gold" style="padding: 6px 12px; font-size: 0.8rem; margin-bottom: 10px;">
+                <i class="fa-solid fa-arrow-left"></i> Volver a los Cursos
+            </a>
+            <h2 style="font-family: 'Share Tech Mono', monospace; font-size: 1.8rem; text-transform: uppercase; color: var(--accent-gold); letter-spacing: 1px; margin-top: 10px;">
+                Temario Académico: {{ $course->title }}
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                Administre lecciones, secciones del mapa y cuestionarios de evaluación táctica.
+            </p>
+        </div>
+        <a href="{{ route('admin.courses.edit', $course->id) }}" class="btn-tactical" style="align-self: flex-end;">
+            <i class="fa-solid fa-pen-to-square"></i> Editar Datos del Curso
         </a>
-        <h2 style="font-family: 'Share Tech Mono', monospace; font-size: 1.8rem; text-transform: uppercase; color: var(--accent-gold); letter-spacing: 1px; margin-top: 10px;">
-            Temario Académico: {{ $course->title }}
-        </h2>
-        <p style="color: var(--text-secondary); font-size: 0.9rem;">
-            Administre las lecciones, su contenido teórico y los cuestionarios de evaluación táctica.
-        </p>
     </div>
 
     @if (session('success'))
@@ -164,18 +169,23 @@
                             </span>
                             <span>{{ $lesson->title }}</span>
                         </div>
-                        <form action="{{ route('admin.lessons.destroy', $lesson->id) }}" method="POST" onsubmit="return confirm('¿Confirma la eliminación de esta lección?');" style="margin-left: auto;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-tactical btn-tactical-danger" style="padding: 4px 10px; font-size: 0.7rem;">
-                                <i class="fa-solid fa-trash-can"></i> Quitar
-                            </button>
-                        </form>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
+                            <a href="{{ route('admin.lessons.edit', $lesson->id) }}" class="btn-tactical btn-tactical-gold" style="padding: 4px 10px; font-size: 0.7rem; text-decoration: none;">
+                                <i class="fa-solid fa-pen"></i> Editar
+                            </a>
+                            <form action="{{ route('admin.lessons.destroy', $lesson->id) }}" method="POST" onsubmit="return confirm('¿Confirma la eliminación de esta lección?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-tactical btn-tactical-danger" style="padding: 4px 10px; font-size: 0.7rem;">
+                                    <i class="fa-solid fa-trash-can"></i> Quitar
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
                     {{-- Lesson Content --}}
-                    <div class="panel-body" style="padding: 20px; font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary); background: rgba(7, 9, 14, 0.3);">
-                        {!! nl2br(e($lesson->content)) !!}
+                    <div class="panel-body lesson-preview-body" style="padding: 20px; font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary); background: rgba(7, 9, 14, 0.3); max-height: 280px; overflow-y: auto;">
+                        {!! $lesson->content !!}
                     </div>
 
                     {{-- Quiz Management Panel --}}
@@ -211,13 +221,18 @@
                                     </div>
                                     <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
                                         <span class="question-item-meta">+{{ $question->points }} XP</span>
-                                        <form action="{{ route('admin.questions.destroy', $question->id) }}" method="POST" onsubmit="return confirm('¿Eliminar esta pregunta?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn-tactical btn-tactical-danger" style="padding: 3px 8px; font-size: 0.7rem;">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <div style="display: flex; gap: 6px;">
+                                            <a href="{{ route('admin.questions.edit', $question->id) }}" class="btn-tactical btn-tactical-gold" style="padding: 3px 8px; font-size: 0.7rem; text-decoration: none;">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+                                            <form action="{{ route('admin.questions.destroy', $question->id) }}" method="POST" onsubmit="return confirm('¿Eliminar esta pregunta?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn-tactical btn-tactical-danger" style="padding: 3px 8px; font-size: 0.7rem;">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             @empty
