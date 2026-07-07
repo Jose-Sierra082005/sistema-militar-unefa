@@ -35,4 +35,39 @@ class User extends Authenticatable
     {
         return $this->hasMany(LessonCompletion::class);
     }
+
+    /**
+     * Normaliza la cédula de identidad limpiando puntos, guiones, espacios y letras.
+     */
+    public static function normalizeCedula(?string $cedula): string
+    {
+        if (empty($cedula)) {
+            return '';
+        }
+        $clean = str_replace(['.', '-', ' '], '', $cedula);
+
+        return preg_replace('/^[VEve]/', '', $clean);
+    }
+
+    /**
+     * Obtiene el rango militar del usuario basado en sus puntos de experiencia (XP).
+     */
+    public function getRankAttribute(): string
+    {
+        $pts = $this->points ?? 0;
+        if ($pts >= 500) {
+            return 'General Académico';
+        }
+        if ($pts >= 300) {
+            return 'Teniente Académico';
+        }
+        if ($pts >= 150) {
+            return 'Sargento Académico';
+        }
+        if ($pts >= 50) {
+            return 'Distinguido';
+        }
+
+        return 'Cadete';
+    }
 }

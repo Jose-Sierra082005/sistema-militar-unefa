@@ -230,15 +230,8 @@
             
             <div class="student-stat-card">
                 <span class="student-stat-label">Rango Académico</span>
-                @php
-                    $rank = 'Cadete';
-                    if ($user->points >= 500) $rank = 'General Académico';
-                    elseif ($user->points >= 300) $rank = 'Teniente Académico';
-                    elseif ($user->points >= 150) $rank = 'Sargento Académico';
-                    elseif ($user->points >= 50) $rank = 'Distinguido';
-                @endphp
                 <span class="student-stat-value" style="font-size: 1rem; font-family: 'Share Tech Mono', monospace; margin-top: 6px;">
-                    <i class="fa-solid fa-medal" style="margin-right: 4px;"></i>{{ $rank }}
+                    <i class="fa-solid fa-medal" style="margin-right: 4px;"></i>{{ $user->rank }}
                 </span>
             </div>
         </div>
