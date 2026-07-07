@@ -2,33 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Course;
 use App\Models\Lesson;
-use App\Models\Question;
 use App\Models\LessonCompletion;
+use App\Models\Question;
+use App\Services\EmailService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 
+/**
+ * Class StudentPortalController
+ * Controla el Portal del Estudiante, sirviendo el mapa de cursos (estilo Duolingo),
+ * la visualización de lecciones, quizzes, perfiles académicos y de seguridad.
+ */
 class StudentPortalController extends Controller
 {
     // =========================================================
     // DASHBOARD
     // =========================================================
 
+    /**
+     * Muestra el dashboard del estudiante con el progreso acumulado en cada curso militar.
+     *
+     * @return View
+     */
     public function index()
     {
-        $user    = Auth::user();
+        $user = Auth::user();
         $courses = Course::with('lessons')->get();
 
         foreach ($courses as $course) {
             $lessonIds = $course->lessons->pluck('id')->toArray();
             if (empty($lessonIds)) {
                 $course->progress_percent = 0;
-                $course->completed_count  = 0;
+                $course->completed_count = 0;
             } else {
-                $completedCount           = LessonCompletion::where('user_id', $user->id)
+                $completedCount = LessonCompletion::where('user_id', $user->id)
                     ->whereIn('lesson_id', $lessonIds)->count();
-                $course->completed_count  = $completedCount;
+                $course->completed_count = $completedCount;
                 $course->progress_percent = round(($completedCount / count($lessonIds)) * 100);
             }
         }
@@ -42,10 +55,10 @@ class StudentPortalController extends Controller
 
     public function showProfile()
     {
-        $user             = Auth::user();
-        $totalXp          = $user->points ?? 0;
+        $user = Auth::user();
+        $totalXp = $user->points ?? 0;
         $completedLessons = LessonCompletion::where('user_id', $user->id)->count();
-        $totalCourses     = Course::count();
+        $totalCourses = Course::count();
 
         return view('student.profile.index', compact('user', 'totalXp', 'completedLessons', 'totalCourses'));
     }
@@ -53,12 +66,12 @@ class StudentPortalController extends Controller
     public function updateProfile(Request $request)
     {
         $request->validate([
-            'name'  => 'required|string|max:100',
-            'email' => 'required|email|unique:users,email,' . Auth::id(),
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email,'.Auth::id(),
         ]);
 
-        $user        = Auth::user();
-        $user->name  = $request->name;
+        $user = Auth::user();
+        $user->name = $request->name;
         $user->email = $request->email;
         $user->save();
 
@@ -81,15 +94,16 @@ class StudentPortalController extends Controller
         ];
 
         $pwMessages = [
-            'new_password.min'       => 'La contrasena debe tener al menos 8 caracteres.',
+            'new_password.min' => 'La contrasena debe tener al menos 8 caracteres.',
             'new_password.confirmed' => 'La confirmacion no coincide.',
-            'new_password.regex'     => 'Debe incluir mayuscula, minuscula, numero y caracter especial (@$!%*?&).',
+            'new_password.regex' => 'Debe incluir mayuscula, minuscula, numero y caracter especial (@$!%*?&).',
         ];
 
         if ($user->google_id) {
             $request->validate(['new_password' => $pwRules], $pwMessages);
             $user->password = $request->new_password;
             $user->save();
+
             return redirect()->route('student.profile.show')
                 ->with('success', 'Contrasena establecida. Ya puede iniciar sesion con su correo y contrasena.');
         }
@@ -99,7 +113,7 @@ class StudentPortalController extends Controller
             array_merge(['current_password.required' => 'La contrasena actual es obligatoria.'], $pwMessages)
         );
 
-        if (!\Hash::check($request->current_password, $user->password)) {
+        if (! \Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'La contrasena actual no es correcta.'])->withInput();
         }
 
@@ -122,7 +136,7 @@ class StudentPortalController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->two_factor_enabled) {
+        if (! $user->two_factor_enabled) {
             return back()->with('error', 'El 2FA no esta activo en su cuenta.');
         }
 
@@ -130,17 +144,17 @@ class StudentPortalController extends Controller
 
         // Guardar OTP en sesion (10 minutos de validez)
         session([
-            '2fa.disable.otp'     => $otp,
+            '2fa.disable.otp' => $otp,
             '2fa.disable.expires' => now()->addMinutes(10)->timestamp,
-            '2fa.disable.uid'     => $user->id,
+            '2fa.disable.uid' => $user->id,
         ]);
 
-        $sent = \App\Services\EmailService::sendOtpEmail($user->email, $user->name, $otp);
+        $sent = EmailService::sendOtpEmail($user->email, $user->name, $otp);
 
         if ($sent) {
             return back()
                 ->with('2fa_otp_sent', true)
-                ->with('info_2fa', 'Codigo enviado a ' . $user->email . '. Caduca en 10 minutos.');
+                ->with('info_2fa', 'Codigo enviado a '.$user->email.'. Caduca en 10 minutos.');
         }
 
         return back()->with('error', 'No se pudo enviar el correo de verificacion. Intente nuevamente.');
@@ -155,22 +169,23 @@ class StudentPortalController extends Controller
             ['disable_otp' => 'required|string|digits:6'],
             [
                 'disable_otp.required' => 'El codigo OTP es obligatorio.',
-                'disable_otp.digits'   => 'El codigo debe ser de 6 digitos numericos.',
+                'disable_otp.digits' => 'El codigo debe ser de 6 digitos numericos.',
             ]
         );
 
         $user = Auth::user();
 
         $storedOtp = session('2fa.disable.otp');
-        $expires   = session('2fa.disable.expires');
+        $expires = session('2fa.disable.expires');
         $storedUid = session('2fa.disable.uid');
 
-        if (!$storedOtp || $storedUid !== $user->id) {
+        if (! $storedOtp || $storedUid !== $user->id) {
             return back()->withErrors(['disable_otp' => 'Solicitud invalida o sesion expirada. Solicite un nuevo codigo.']);
         }
 
         if (now()->timestamp > $expires) {
             session()->forget(['2fa.disable.otp', '2fa.disable.expires', '2fa.disable.uid']);
+
             return back()->withErrors(['disable_otp' => 'El codigo OTP ha expirado. Solicite uno nuevo.']);
         }
 
@@ -182,7 +197,7 @@ class StudentPortalController extends Controller
 
         // Desactivar el 2FA
         $user->two_factor_enabled = false;
-        $user->two_factor_secret  = null;
+        $user->two_factor_secret = null;
         $user->save();
 
         session()->forget(['2fa.disable.otp', '2fa.disable.expires', '2fa.disable.uid']);
@@ -197,7 +212,7 @@ class StudentPortalController extends Controller
 
     public function showCourse($id)
     {
-        $user   = Auth::user();
+        $user = Auth::user();
         $course = Course::with(['lessons' => function ($q) {
             $q->orderBy('order', 'asc')->orderBy('id', 'asc');
         }])->findOrFail($id);
@@ -208,8 +223,8 @@ class StudentPortalController extends Controller
         $unlockedNext = true;
         foreach ($course->lessons as $lesson) {
             $lesson->is_completed = in_array($lesson->id, $completedLessonIds);
-            $lesson->is_unlocked  = $unlockedNext;
-            $unlockedNext         = $lesson->is_completed;
+            $lesson->is_unlocked = $unlockedNext;
+            $unlockedNext = $lesson->is_completed;
         }
 
         return view('student.courses.show', compact('course', 'user',
@@ -218,7 +233,7 @@ class StudentPortalController extends Controller
 
     public function showLesson($id)
     {
-        $user   = Auth::user();
+        $user = Auth::user();
         $lesson = Lesson::with('course')->findOrFail($id);
 
         $course = Course::with(['lessons' => function ($q) {
@@ -228,15 +243,18 @@ class StudentPortalController extends Controller
         $completedLessonIds = LessonCompletion::where('user_id', $user->id)
             ->pluck('lesson_id')->toArray();
 
-        $unlocked     = false;
+        $unlocked = false;
         $unlockedNext = true;
 
         foreach ($course->lessons as $l) {
-            if ($l->id === $lesson->id) { $unlocked = $unlockedNext; break; }
+            if ($l->id === $lesson->id) {
+                $unlocked = $unlockedNext;
+                break;
+            }
             $unlockedNext = in_array($l->id, $completedLessonIds);
         }
 
-        if (!$unlocked) {
+        if (! $unlocked) {
             return redirect()->route('student.courses.show', $lesson->course_id)
                 ->with('error', 'Esta leccion esta bloqueada. Complete las anteriores primero.');
         }
@@ -248,37 +266,45 @@ class StudentPortalController extends Controller
 
     public function downloadPdf($id)
     {
-        $lesson   = Lesson::with('course')->findOrFail($id);
-        $content  = "=================================================================\n";
-        $content .= "             TACTIC FORCE\n";
-        $content .= "             MANUAL DE ESTUDIO TACTICO ACADEMICO\n";
-        $content .= "=================================================================\n\n";
-        $content .= "CURSO: "      . mb_strtoupper($lesson->course->title)     . "\n";
-        $content .= "CATEGORIA: "  . mb_strtoupper($lesson->course->category)   . "\n";
-        $content .= "DIFICULTAD: " . mb_strtoupper($lesson->course->difficulty) . "\n";
-        $content .= "LECCION: "    . mb_strtoupper($lesson->title)              . "\n";
-        $content .= "FECHA: "      . date('d/m/Y H:i:s')                        . "\n";
-        $content .= "-----------------------------------------------------------------\n\n";
-        $content .= "CONTENIDO:\n\n";
+        try {
+            $lesson = Lesson::with('course')->findOrFail($id);
+            Log::info('[INFO] ['.now()->toDateString()."]: Generando material táctico de descarga para lección '{$lesson->title}' (ID: {$id}).");
 
-        $clean    = strip_tags(str_replace(
-            ['<p>', '</p>', '<br>', '<br/>', '</li>', '</ul>'],
-            ['', "\n", "\n", "\n", "\n", ''],
-            $lesson->content
-        ));
-        $content .= trim($clean) . "\n\n";
-        $content .= "-----------------------------------------------------------------\n";
-        $content .= "                FIN DEL MATERIAL DE ESTUDIO\n";
-        $content .= "=================================================================\n";
+            $content = "=================================================================\n";
+            $content .= "             TACTIC FORCE\n";
+            $content .= "             MANUAL DE ESTUDIO TACTICO ACADEMICO\n";
+            $content .= "=================================================================\n\n";
+            $content .= 'CURSO: '.mb_strtoupper($lesson->course->title)."\n";
+            $content .= 'CATEGORIA: '.mb_strtoupper($lesson->course->category)."\n";
+            $content .= 'DIFICULTAD: '.mb_strtoupper($lesson->course->difficulty)."\n";
+            $content .= 'LECCION: '.mb_strtoupper($lesson->title)."\n";
+            $content .= 'FECHA: '.date('d/m/Y H:i:s')."\n";
+            $content .= "-----------------------------------------------------------------\n\n";
+            $content .= "CONTENIDO:\n\n";
 
-        $filename = 'Manual_' . str_replace(
-            [' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $lesson->title
-        ) . '.txt';
+            $clean = strip_tags(str_replace(
+                ['<p>', '</p>', '<br>', '<br/>', '</li>', '</ul>'],
+                ['', "\n", "\n", "\n", "\n", ''],
+                $lesson->content
+            ));
+            $content .= trim($clean)."\n\n";
+            $content .= "-----------------------------------------------------------------\n";
+            $content .= "                FIN DEL MATERIAL DE ESTUDIO\n";
+            $content .= "=================================================================\n";
 
-        return response($content, 200, [
-            'Content-Type'        => 'text/plain; charset=utf-8',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-        ]);
+            $filename = 'Manual_'.str_replace(
+                [' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $lesson->title
+            ).'.txt';
+
+            return response($content, 200, [
+                'Content-Type' => 'text/plain; charset=utf-8',
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('[ERROR] ['.now()->toDateString()."]: Error al generar material de estudio de lección (ID: {$id}). Detalle: ".$e->getMessage());
+
+            return back()->with('error', 'No se pudo descargar el material táctico de estudio en este momento.');
+        }
     }
 
     // =========================================================
@@ -287,7 +313,7 @@ class StudentPortalController extends Controller
 
     public function startQuiz($lesson_id)
     {
-        $user   = Auth::user();
+        $user = Auth::user();
         $lesson = Lesson::with(['course', 'questions.options'])->findOrFail($lesson_id);
 
         $questions = $lesson->questions;
@@ -302,13 +328,13 @@ class StudentPortalController extends Controller
 
         $formattedQuestions = $questions->map(function ($q) {
             return [
-                'id'            => $q->id,
+                'id' => $q->id,
                 'question_text' => $q->question_text,
-                'points'        => $q->points,
-                'options'       => $q->options->map(fn($o) => [
-                    'id'          => $o->id,
+                'points' => $q->points,
+                'options' => $q->options->map(fn ($o) => [
+                    'id' => $o->id,
                     'option_text' => $o->option_text,
-                    'is_correct'  => $o->is_correct,
+                    'is_correct' => $o->is_correct,
                 ])->shuffle()->values()->toArray(),
             ];
         })->toArray();
@@ -318,22 +344,34 @@ class StudentPortalController extends Controller
 
     public function completeQuiz(Request $request, $lesson_id)
     {
-        $user   = Auth::user();
-        $lesson = Lesson::findOrFail($lesson_id);
+        try {
+            $user = Auth::user();
+            $lesson = Lesson::findOrFail($lesson_id);
 
-        $alreadyDone = LessonCompletion::where('user_id', $user->id)
-            ->where('lesson_id', $lesson->id)->exists();
+            $alreadyDone = LessonCompletion::where('user_id', $user->id)
+                ->where('lesson_id', $lesson->id)->exists();
 
-        if (!$alreadyDone) {
-            LessonCompletion::create(['user_id' => $user->id, 'lesson_id' => $lesson->id]);
-            $pts = (int) $request->input('points_earned', 50);
-            $user->increment('points', $pts);
+            if (! $alreadyDone) {
+                LessonCompletion::create(['user_id' => $user->id, 'lesson_id' => $lesson->id]);
+                $pts = (int) $request->input('points_earned', 50);
+                $user->increment('points', $pts);
+                Log::info('[INFO] ['.now()->toDateString()."]: Estudiante {$user->email} completó la lección '{$lesson->title}' y ganó {$pts} XP.");
+
+                return redirect()->route('student.courses.show', $lesson->course_id)
+                    ->with('success', "Leccion '{$lesson->title}' completada. +{$pts} XP.");
+            }
+
+            Log::info('[INFO] ['.now()->toDateString()."]: Estudiante {$user->email} repasó la lección '{$lesson->title}'.");
+
             return redirect()->route('student.courses.show', $lesson->course_id)
-                ->with('success', "Leccion '{$lesson->title}' completada. +{$pts} XP.");
-        }
+                ->with('info', "Leccion '{$lesson->title}' completada (el repaso no suma puntos).");
 
-        return redirect()->route('student.courses.show', $lesson->course_id)
-            ->with('info', "Leccion '{$lesson->title}' completada (el repaso no suma puntos).");
+        } catch (\Exception $e) {
+            Log::error('[ERROR] ['.now()->toDateString()."]: Fallo al completar el quiz para la lección {$lesson_id}. Detalle: ".$e->getMessage());
+
+            return redirect()->route('student.dashboard')
+                ->with('error', 'Ocurrió un error inesperado al procesar tu progreso de lección.');
+        }
     }
 
     // =========================================================
@@ -342,8 +380,8 @@ class StudentPortalController extends Controller
 
     private function fallbackQuestion($lesson, $n)
     {
-        $q         = new Question();
-        $q->id     = 1000 + $n;
+        $q = new Question;
+        $q->id = 1000 + $n;
         $q->points = 15;
 
         $data = [
@@ -378,7 +416,7 @@ class StudentPortalController extends Controller
 
         $q->question_text = $data[$n]['q'];
         $q->options = collect(array_map(
-            fn($o) => (object)['id' => $o[0], 'option_text' => $o[1], 'is_correct' => $o[2]],
+            fn ($o) => (object) ['id' => $o[0], 'option_text' => $o[1], 'is_correct' => $o[2]],
             $data[$n]['opts']
         ));
 

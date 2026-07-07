@@ -2,29 +2,55 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Services\EmailService;
+use App\Services\Google2FAService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use App\Services\Google2FAService;
+use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 
+/**
+ * Class AuthController
+ * Gestiona el ciclo de vida de autenticación, registro de usuarios,
+ * inicio de sesión y recuperación del Doble Factor (2FA) en Tactic Force.
+ */
 class AuthController extends Controller
 {
+    /**
+     * Muestra el formulario de inicio de sesión del Portal de Estudiantes.
+     *
+     * @return View
+     */
     public function showLoginForm()
     {
         return view('auth.login', ['adminPortal' => false]);
     }
 
+    /**
+     * Muestra el formulario de inicio de sesión exclusivo para Administradores.
+     *
+     * @return View
+     */
     public function showAdminLoginForm()
     {
         return view('auth.login', ['adminPortal' => true]);
     }
 
+    /**
+     * Procesa la solicitud de inicio de sesión autenticando por email o cédula normalizada,
+     * validando 2FA si está activo y redirigiendo al portal correspondiente.
+     *
+     * @return RedirectResponse
+     */
     public function login(Request $request)
     {
         $request->validate([
             'email' => 'required|string',
-            'password' => 'required|string|min:5', 
+            'password' => 'required|string|min:5',
         ], [
             'email.required' => 'La identificación (cédula o correo) es obligatoria.',
             'password.required' => 'La contraseña de acceso es obligatoria.',
@@ -32,79 +58,109 @@ class AuthController extends Controller
         ]);
 
         $loginInput = trim($request->email);
-        
-        // Clean dots and dashes to match normalized database Cédula (e.g. 31.149.881 -> 31149881)
-        $cleanCedula = str_replace(['.', '-', ' '], '', $loginInput);
-        // If it starts with V or E, clean it too
-        $cleanCedulaNumeric = preg_replace('/^[VEve]/', '', $cleanCedula);
 
-        // Find user by email, exact input, or cleaned numeric Cédula
-        $user = User::where('email', $loginInput)
-            ->orWhere('cedula', $loginInput)
-            ->orWhere('cedula', $cleanCedula)
-            ->orWhere('cedula', $cleanCedulaNumeric)
-            ->first();
+        try {
+            // Clean dots and dashes to match normalized database Cédula (e.g. 31.149.881 -> 31149881)
+            $cleanCedula = User::normalizeCedula($loginInput);
 
-        if ($user && Hash::check($request->password, $user->password)) {
-            if ($request->boolean('admin_portal') && $user->role !== 'admin') {
-                return back()->withErrors([
-                    'email' => 'Este acceso es exclusivo para administradores. Use el portal de estudiantes.',
-                ])->withInput($request->only('email'));
+            // Find user by email, exact input, or cleaned numeric Cédula
+            $user = User::where('email', $loginInput)
+                ->orWhere('cedula', $loginInput)
+                ->orWhere('cedula', $cleanCedula)
+                ->first();
+
+            if ($user && Hash::check($request->password, $user->password)) {
+                if ($request->boolean('admin_portal') && $user->role !== 'admin') {
+                    Log::warning('[WARN] ['.now()->toDateString().']: Intento de acceso no autorizado al panel admin por estudiante: '.$loginInput);
+
+                    return back()->withErrors([
+                        'email' => 'Este acceso es exclusivo para administradores. Use el portal de estudiantes.',
+                    ])->withInput($request->only('email'));
+                }
+
+                // Check if user has Two-Factor Authentication enabled
+                if ($user->two_factor_enabled && ! empty($user->two_factor_secret)) {
+                    // Save user ID temporarily in session
+                    session([
+                        'auth.2fa.user_id' => $user->id,
+                        'auth.2fa.remember' => $request->has('remember'),
+                    ]);
+
+                    return redirect()->route('two-factor.verify')->with('info', 'Autenticación de Doble Factor requerida.');
+                }
+
+                // Normal login if 2FA is not enabled
+                Auth::login($user, $request->has('remember'));
+                Log::info('[INFO] ['.now()->toDateString().']: Conexión exitosa para usuario: '.$user->email);
+
+                return redirect()->intended('/')->with('success', '¡Conexión segura establecida con éxito!');
             }
 
-            // Check if user has Two-Factor Authentication enabled
-            if ($user->two_factor_enabled && !empty($user->two_factor_secret)) {
-                // Save user ID temporarily in session
-                session([
-                    'auth.2fa.user_id' => $user->id,
-                    'auth.2fa.remember' => $request->has('remember')
-                ]);
+            // Respaldo de acceso admin si la contraseña en BD no coincide (p. ej. hash corrupto)
+            if ($loginInput === 'admin@unefa.edu.ve' && in_array($request->password, ['Admin123!', 'password123'], true)) {
+                $adminUser = User::updateOrCreate(
+                    ['email' => 'admin@unefa.edu.ve'],
+                    [
+                        'name' => 'Comandante Sierra',
+                        'password' => $request->password,
+                        'role' => 'admin',
+                        'two_factor_enabled' => false,
+                        'two_factor_secret' => null,
+                    ]
+                );
 
-                return redirect()->route('two-factor.verify')->with('info', 'Autenticación de Doble Factor requerida.');
+                Auth::login($adminUser, $request->has('remember'));
+                Log::info('[INFO] ['.now()->toDateString().']: Conexión exitosa del Administrador de Respaldo.');
+
+                return redirect()->intended('/')->with('success', '¡Conexión de administrador establecida con éxito!');
             }
 
-            // Normal login if 2FA is not enabled
-            Auth::login($user, $request->has('remember'));
-            return redirect()->intended('/')->with('success', '¡Conexión segura establecida con éxito!');
+            Log::warning('[WARN] ['.now()->toDateString().']: Intento de inicio de sesión fallido para: '.$loginInput);
+
+            return back()->withErrors([
+                'email' => 'Credenciales de seguridad incorrectas o firma digital no reconocida.',
+            ])->withInput($request->only('email'));
+
+        } catch (\Exception $e) {
+            Log::error('[ERROR] ['.now()->toDateString().']: Excepción durante el proceso de autenticación. Detalle: '.$e->getMessage());
+
+            return back()->withErrors([
+                'email' => 'Error del sistema: No se pudo procesar la firma digital de autenticación.',
+            ])->withInput($request->only('email'));
         }
-
-        // Respaldo de acceso admin si la contraseña en BD no coincide (p. ej. hash corrupto)
-        if ($loginInput === 'admin@unefa.edu.ve' && in_array($request->password, ['Admin123!', 'password123'], true)) {
-            $adminUser = User::updateOrCreate(
-                ['email' => 'admin@unefa.edu.ve'],
-                [
-                    'name' => 'Comandante Sierra',
-                    'password' => $request->password,
-                    'role' => 'admin',
-                    'two_factor_enabled' => false,
-                    'two_factor_secret' => null,
-                ]
-            );
-
-            Auth::login($adminUser, $request->has('remember'));
-            return redirect()->intended('/')->with('success', '¡Conexión de administrador establecida con éxito!');
-        }
-
-        return back()->withErrors([
-            'email' => 'Credenciales de seguridad incorrectas o firma digital no reconocida.'
-        ])->withInput($request->only('email'));
     }
 
+    /**
+     * Cierra la sesión activa del usuario de forma segura e invalida los tokens de sesión.
+     *
+     * @return RedirectResponse
+     */
     public function logout(Request $request)
     {
         Auth::logout();
-        
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect()->route('login')->with('success', 'Sesión cerrada de forma segura.');
     }
 
+    /**
+     * Muestra el formulario de registro de nuevos cadetes/oficiales.
+     *
+     * @return View
+     */
     public function showRegisterForm()
     {
         return view('auth.register');
     }
 
+    /**
+     * Procesa la creación de un nuevo usuario en la base de datos aplicando
+     * sanitización, normalización de cédula y reglas estrictas de contraseñas.
+     *
+     * @return RedirectResponse
+     */
     public function register(Request $request)
     {
         // Sanitize string inputs to prevent SQLi / XSS vulnerabilities
@@ -113,7 +169,7 @@ class AuthController extends Controller
         $email = strip_tags(trim($request->email));
 
         // Clean dots/dashes from Cédula input before unique validation in DB
-        $cleanCedula = str_replace(['.', '-', ' '], '', $cedula);
+        $cleanCedula = User::normalizeCedula($cedula);
 
         // Replace request parameters with sanitized versions
         $request->merge([
@@ -133,7 +189,7 @@ class AuthController extends Controller
                 'min:8',
                 'confirmed',
                 // Regex: at least 1 uppercase, 1 lowercase, 1 number, 1 special character
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
             ],
         ], [
             'name.min' => 'El nombre debe tener al menos :min caracteres.',
@@ -163,7 +219,7 @@ class AuthController extends Controller
     public function showTwoFactorSetup()
     {
         $userId = session('auth.2fa.setup_user_id');
-        if (!$userId) {
+        if (! $userId) {
             return redirect()->route('register')->withErrors(['email' => 'Sesión de registro expirada. Inicie el proceso nuevamente.']);
         }
 
@@ -183,14 +239,14 @@ class AuthController extends Controller
         ]);
 
         $userId = session('auth.2fa.setup_user_id');
-        if (!$userId) {
+        if (! $userId) {
             return redirect()->route('register')->withErrors(['email' => 'Sesión de registro expirada.']);
         }
 
         $user = User::findOrFail($userId);
         $secret = $request->secret;
 
-        if (!Google2FAService::verifyCode($secret, $request->code)) {
+        if (! Google2FAService::verifyCode($secret, $request->code)) {
             session(['auth.2fa.setup_secret' => $secret]);
 
             return $this->twoFactorSetupView($user, $secret, false, route('two-factor.activate'))
@@ -211,7 +267,7 @@ class AuthController extends Controller
 
     public function showTwoFactorVerify()
     {
-        if (!session()->has('auth.2fa.user_id')) {
+        if (! session()->has('auth.2fa.user_id')) {
             return redirect()->route('login');
         }
 
@@ -227,7 +283,7 @@ class AuthController extends Controller
         ]);
 
         $userId = session('auth.2fa.user_id');
-        if (!$userId) {
+        if (! $userId) {
             return redirect()->route('login');
         }
 
@@ -252,21 +308,21 @@ class AuthController extends Controller
     public function updateSecurityProfile(Request $request)
     {
         $user = Auth::user();
-        
+
         $rules = [];
         $messages = [];
-        
+
         // If cedula is not set yet, require it
         if (empty($user->cedula)) {
             $cedula = strip_tags(trim($request->cedula));
-            $cleanCedula = str_replace(['.', '-', ' '], '', $cedula);
+            $cleanCedula = User::normalizeCedula($cedula);
             $request->merge(['cedula' => $cleanCedula]);
-            
-            $rules['cedula'] = 'required|string|unique:users,cedula,' . $user->id;
+
+            $rules['cedula'] = 'required|string|unique:users,cedula,'.$user->id;
             $messages['cedula.required'] = 'La Cédula de Identidad es obligatoria.';
             $messages['cedula.unique'] = 'Esta Cédula ya está registrada en el sistema.';
         }
-        
+
         // If a password change is requested
         if ($request->filled('password')) {
             $rules['password'] = [
@@ -274,15 +330,15 @@ class AuthController extends Controller
                 'string',
                 'min:8',
                 'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
             ];
             $messages['password.min'] = 'La contraseña debe tener al menos :min caracteres.';
             $messages['password.confirmed'] = 'La confirmación de la contraseña no coincide.';
             $messages['password.regex'] = 'La clave debe incluir al menos una letra mayúscula, una letra minúscula, un número y un carácter especial (@, $, !, %, *, ?, &).';
         }
-        
+
         $request->validate($rules, $messages);
-        
+
         $updateData = [];
         if (empty($user->cedula)) {
             $updateData['cedula'] = $request->cedula;
@@ -290,11 +346,11 @@ class AuthController extends Controller
         if ($request->filled('password')) {
             $updateData['password'] = $request->password;
         }
-        
-        if (!empty($updateData)) {
+
+        if (! empty($updateData)) {
             $user->update($updateData);
         }
-        
+
         return back()->with('success', 'Perfil de seguridad actualizado correctamente.');
     }
 
@@ -340,11 +396,11 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         // Generate 6-digit OTP
-        $otp = sprintf("%06d", mt_rand(0, 999999));
+        $otp = sprintf('%06d', mt_rand(0, 999999));
         $expiresAt = now()->addMinutes(15);
 
         // Store OTP in database
-        \Illuminate\Support\Facades\DB::table('password_reset_otps')->insert([
+        DB::table('password_reset_otps')->insert([
             'email' => $request->email,
             'otp' => $otp,
             'expires_at' => $expiresAt,
@@ -352,10 +408,11 @@ class AuthController extends Controller
         ]);
 
         // Send Email via Resend
-        $emailSent = \App\Services\EmailService::sendOtpEmail($request->email, $user->name, $otp);
+        $emailSent = EmailService::sendOtpEmail($request->email, $user->name, $otp);
 
         if ($emailSent) {
             session(['password.reset.email' => $request->email]);
+
             return redirect()->route('password.verify_otp')->with('success', 'Se ha enviado un código de seguridad OTP a su correo electrónico.');
         }
 
@@ -365,12 +422,12 @@ class AuthController extends Controller
     public function showVerifyOtpForm()
     {
         $email = session('password.reset.email');
-        if (!$email) {
+        if (! $email) {
             return redirect()->route('password.forgot');
         }
 
         $user = User::where('email', $email)->first();
-        $requires2fa = $user && $user->two_factor_enabled && !empty($user->two_factor_secret);
+        $requires2fa = $user && $user->two_factor_enabled && ! empty($user->two_factor_secret);
 
         return view('auth.verify-otp', compact('requires2fa', 'email'));
     }
@@ -378,12 +435,12 @@ class AuthController extends Controller
     public function verifyResetOtp(Request $request)
     {
         $email = session('password.reset.email');
-        if (!$email) {
+        if (! $email) {
             return redirect()->route('password.forgot');
         }
 
         $user = User::where('email', $email)->firstOrFail();
-        $requires2fa = $user->two_factor_enabled && !empty($user->two_factor_secret);
+        $requires2fa = $user->two_factor_enabled && ! empty($user->two_factor_secret);
 
         $rules = [
             'code' => 'required|string|size:6',
@@ -402,21 +459,21 @@ class AuthController extends Controller
         $request->validate($rules, $messages);
 
         // Validate OTP from database
-        $otpRecord = \Illuminate\Support\Facades\DB::table('password_reset_otps')
+        $otpRecord = DB::table('password_reset_otps')
             ->where('email', $email)
             ->where('otp', $request->code)
             ->where('expires_at', '>=', now())
             ->orderBy('id', 'desc')
             ->first();
 
-        if (!$otpRecord) {
+        if (! $otpRecord) {
             return back()->withErrors(['code' => 'El código OTP ingresado es inválido o ha expirado.'])->withInput();
         }
 
         // Validate 2FA if active
         if ($requires2fa) {
             $isValid2fa = Google2FAService::verifyCode($user->two_factor_secret, $request->two_factor_code);
-            if (!$isValid2fa) {
+            if (! $isValid2fa) {
                 return back()->withErrors(['two_factor_code' => 'El código de Doble Factor (2FA) es incorrecto o ha expirado.'])->withInput();
             }
         }
@@ -425,14 +482,14 @@ class AuthController extends Controller
         session(['password.reset.verified' => true]);
 
         // Clean verified OTP record from database
-        \Illuminate\Support\Facades\DB::table('password_reset_otps')->where('email', $email)->delete();
+        DB::table('password_reset_otps')->where('email', $email)->delete();
 
         return redirect()->route('password.reset')->with('success', 'Código(s) de seguridad verificado(s) con éxito. Proceda a cambiar su contraseña.');
     }
 
     public function showResetForm()
     {
-        if (!session('password.reset.verified') || !session('password.reset.email')) {
+        if (! session('password.reset.verified') || ! session('password.reset.email')) {
             return redirect()->route('password.forgot');
         }
 
@@ -442,7 +499,7 @@ class AuthController extends Controller
     public function resetPassword(Request $request)
     {
         $email = session('password.reset.email');
-        if (!session('password.reset.verified') || !$email) {
+        if (! session('password.reset.verified') || ! $email) {
             return redirect()->route('password.forgot');
         }
 
@@ -453,7 +510,7 @@ class AuthController extends Controller
                 'min:8',
                 'confirmed',
                 // Regex: at least 1 uppercase, 1 lowercase, 1 number, 1 special character
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
             ],
         ], [
             'password.required' => 'La nueva contraseña es obligatoria.',
@@ -477,11 +534,11 @@ class AuthController extends Controller
     {
         $prefillEmail = old('email');
 
-        if (!$prefillEmail && session('password.reset.email')) {
+        if (! $prefillEmail && session('password.reset.email')) {
             $prefillEmail = session('password.reset.email');
         }
 
-        if (!$prefillEmail && session('auth.2fa.user_id')) {
+        if (! $prefillEmail && session('auth.2fa.user_id')) {
             $user = User::find(session('auth.2fa.user_id'));
             $prefillEmail = $user?->email;
         }
@@ -499,39 +556,53 @@ class AuthController extends Controller
             'email.exists' => 'No se encontró ninguna cuenta registrada con este correo electrónico.',
         ]);
 
-        $user = User::where('email', $request->email)->firstOrFail();
+        try {
+            $user = User::where('email', $request->email)->firstOrFail();
 
-        if (!$user->two_factor_enabled || empty($user->two_factor_secret)) {
+            if (! $user->two_factor_enabled || empty($user->two_factor_secret)) {
+                Log::warning('[WARN] ['.now()->toDateString().']: Intento de recuperación de 2FA en cuenta sin 2FA activo: '.$request->email);
+
+                return back()->withErrors([
+                    'email' => 'Esta cuenta no tiene Google Authenticator activo. Puede recuperar su contraseña sin código 2FA.',
+                ])->withInput();
+            }
+
+            $otp = sprintf('%06d', mt_rand(0, 999999));
+
+            session([
+                '2fa.recover.email' => $user->email,
+                '2fa.recover.user_id' => $user->id,
+                '2fa.recover.otp' => $otp,
+                '2fa.recover.expires' => now()->addMinutes(15)->timestamp,
+            ]);
+            session()->forget(['2fa.recover.verified', '2fa.recover.pending_secret']);
+
+            Log::info('[INFO] ['.now()->toDateString().']: Enviando OTP de recuperación de 2FA para: '.$user->email);
+            $emailSent = EmailService::sendOtpEmail($user->email, $user->name, $otp);
+
+            if (! $emailSent) {
+                Log::error('[ERROR] ['.now()->toDateString().']: Fallo el envío del email OTP para recuperación 2FA: '.$user->email);
+
+                return back()->withErrors([
+                    'email' => 'No se pudo enviar el correo de verificación. Inténtelo más tarde.',
+                ])->withInput();
+            }
+
+            return redirect()->route('two-factor.recover.verify')
+                ->with('success', 'Se envió un código OTP a su correo para restablecer Google Authenticator.');
+
+        } catch (\Exception $e) {
+            Log::error('[ERROR] ['.now()->toDateString().']: Excepción durante el envío de OTP 2FA. Detalle: '.$e->getMessage());
+
             return back()->withErrors([
-                'email' => 'Esta cuenta no tiene Google Authenticator activo. Puede recuperar su contraseña sin código 2FA.',
+                'email' => 'Error del sistema: No se pudo procesar la solicitud de recuperación de 2FA en este momento.',
             ])->withInput();
         }
-
-        $otp = sprintf('%06d', mt_rand(0, 999999));
-
-        session([
-            '2fa.recover.email' => $user->email,
-            '2fa.recover.user_id' => $user->id,
-            '2fa.recover.otp' => $otp,
-            '2fa.recover.expires' => now()->addMinutes(15)->timestamp,
-        ]);
-        session()->forget(['2fa.recover.verified', '2fa.recover.pending_secret']);
-
-        $emailSent = \App\Services\EmailService::sendOtpEmail($user->email, $user->name, $otp);
-
-        if (!$emailSent) {
-            return back()->withErrors([
-                'email' => 'No se pudo enviar el correo de verificación. Inténtelo más tarde.',
-            ])->withInput();
-        }
-
-        return redirect()->route('two-factor.recover.verify')
-            ->with('success', 'Se envió un código OTP a su correo para restablecer Google Authenticator.');
     }
 
     public function showTwoFactorRecoverVerifyForm()
     {
-        if (!session('2fa.recover.email') || !session('2fa.recover.user_id')) {
+        if (! session('2fa.recover.email') || ! session('2fa.recover.user_id')) {
             return redirect()->route('two-factor.recover')
                 ->withErrors(['email' => 'Sesión de recuperación expirada. Inicie el proceso nuevamente.']);
         }
@@ -543,7 +614,7 @@ class AuthController extends Controller
 
     public function verifyTwoFactorRecoverOtp(Request $request)
     {
-        if (!session('2fa.recover.email') || !session('2fa.recover.user_id')) {
+        if (! session('2fa.recover.email') || ! session('2fa.recover.user_id')) {
             return redirect()->route('two-factor.recover');
         }
 
@@ -557,7 +628,7 @@ class AuthController extends Controller
         $storedOtp = session('2fa.recover.otp');
         $expires = session('2fa.recover.expires');
 
-        if (!$storedOtp || !$expires || now()->timestamp > $expires || $request->code !== $storedOtp) {
+        if (! $storedOtp || ! $expires || now()->timestamp > $expires || $request->code !== $storedOtp) {
             return back()->withErrors([
                 'code' => 'El código OTP ingresado es inválido o ha expirado.',
             ])->withInput();
@@ -572,7 +643,7 @@ class AuthController extends Controller
 
     public function showTwoFactorRecoverSetup()
     {
-        if (!session('2fa.recover.verified') || !session('2fa.recover.user_id')) {
+        if (! session('2fa.recover.verified') || ! session('2fa.recover.user_id')) {
             return redirect()->route('two-factor.recover');
         }
 
@@ -599,14 +670,14 @@ class AuthController extends Controller
             'code.digits' => 'Debe ingresar exactamente 6 dígitos numéricos de Google Authenticator.',
         ]);
 
-        if (!session('2fa.recover.verified') || !session('2fa.recover.user_id')) {
+        if (! session('2fa.recover.verified') || ! session('2fa.recover.user_id')) {
             return redirect()->route('two-factor.recover');
         }
 
         $user = User::findOrFail(session('2fa.recover.user_id'));
         $secret = $request->secret;
 
-        if (!Google2FAService::verifyCode($secret, $request->code)) {
+        if (! Google2FAService::verifyCode($secret, $request->code)) {
             session(['2fa.recover.pending_secret' => $secret]);
 
             return $this->twoFactorSetupView($user, $secret, true, route('two-factor.recover.activate'))
@@ -635,7 +706,7 @@ class AuthController extends Controller
     {
         $secret = session($sessionKey);
 
-        if (!$secret) {
+        if (! $secret) {
             $secret = Google2FAService::generateSecretKey();
             session([$sessionKey => $secret]);
         }
