@@ -2,24 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Course;
 use App\Models\Lesson;
-use App\Models\Question;
 use App\Models\Option;
+use App\Models\Question;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
+/**
+ * Class CourseController
+ * Administra el catálogo de cursos, lecciones y banco de preguntas de la
+ * plataforma Tactic Force en el Panel de Administrador (CMS).
+ */
 class CourseController extends Controller
 {
+    /**
+     * Muestra la lista paginada de cursos registrados en el sistema,
+     * permitiendo búsquedas filtradas por título, categoría o dificultad.
+     *
+     * @return View
+     */
     public function index(Request $request)
     {
         $query = Course::query();
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%")
-                  ->orWhere('difficulty', 'like', "%{$search}%");
+                    ->orWhere('category', 'like', "%{$search}%")
+                    ->orWhere('difficulty', 'like', "%{$search}%");
             });
         }
 
@@ -60,15 +72,17 @@ class CourseController extends Controller
 
     public function show($id)
     {
-        $course = Course::with(['lessons' => function($query) {
+        $course = Course::with(['lessons' => function ($query) {
             $query->orderBy('order', 'asc')->orderBy('id', 'asc');
         }, 'lessons.questions.options'])->findOrFail($id);
+
         return view('admin.courses.show', compact('course'));
     }
 
     public function edit($id)
     {
         $course = Course::findOrFail($id);
+
         return view('admin.courses.edit', compact('course'));
     }
 

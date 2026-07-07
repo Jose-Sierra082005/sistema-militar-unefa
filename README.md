@@ -423,6 +423,19 @@ php artisan test
 
 ---
 
+## 📖 Documentación Técnica Autogenerada
+
+El código del proyecto se encuentra documentado internamente siguiendo el estándar **PHPDoc**. Puedes autogenerar el sitio web de la documentación técnica (clases, controladores y métodos) ejecutando el siguiente comando con Docker (sin necesidad de instalaciones locales adicionales):
+
+```bash
+# Ejecutar desde la raíz del proyecto para generar el sitio web estático en docs/api
+docker run --rm -v "${PWD}:/data" phpdoc/phpdoc:3 run -d /data/app -t /data/docs/api --no-interaction
+```
+
+Una vez completado, abre el archivo `docs/api/index.html` en cualquier navegador web para explorar la estructura técnica detallada del sistema.
+
+---
+
 ## 📄 Licencia y Propósito Académico
 
 Esta aplicación es un **proyecto académico de carácter formativo y sin fines de lucro**, desarrollado para la **UNEFA Núcleo Falcón** en el marco de las materias de *Implantación de Sistemas* y *Metodología*. Todos los derechos sobre la marca **Tactic Force** y su diseño pertenecen a sus respectivos autores.
