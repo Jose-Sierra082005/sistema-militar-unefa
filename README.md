@@ -3,7 +3,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Laravel-v11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
   <img src="https://img.shields.io/badge/PHP-8.4-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP">
-  <img src="https://img.shields.io/badge/SQLite-3.x-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite">
+  <img src="https://img.shields.io/badge/MySQL-Aiven_Cloud-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
   <img src="https://img.shields.io/badge/Docker-Deploy-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
   <img src="https://img.shields.io/badge/Licencia-Académica-1b4332?style=for-the-badge" alt="Licencia">
 </p>
@@ -41,10 +41,10 @@ El sistema se divide en dos grandes áreas funcionales:
 
 ## 🏛️ Arquitectura y Modelado del Sistema
 
-El sistema utiliza el patrón de diseño **Modelo-Vista-Controlador (MVC)** sobre Laravel, empleando una base de datos ligera y veloz mediante **SQLite**, ideal para la portabilidad y despliegue continuo en entornos de producción en la nube (Render).
+El sistema utiliza el patrón de diseño **Modelo-Vista-Controlador (MVC)** sobre Laravel, con una base de datos **MySQL** alojada en la nube mediante el servicio gestionado de **Aiven Cloud**, ideal para la persistencia robusta y el despliegue continuo en entornos de producción (Render).
 
 ### 1. Diagrama de Arquitectura de Capas y Despliegue
-Este diagrama muestra el flujo de la petición del cliente y cómo interactúa con el servidor y la base de datos local SQLite dentro de un contenedor Docker en Render:
+Este diagrama muestra el flujo de la petición del cliente y cómo interactúa con el servidor Laravel y la base de datos MySQL remota en Aiven Cloud, desplegado mediante Docker en Render:
 
 ```mermaid
 graph TB
@@ -62,9 +62,9 @@ graph TB
         VIEW["Vistas Blade + Tailwind CSS<br/>Layouts · Partials · Dashboard"]
     end
 
-    subgraph DATA["🗄️ CAPA DE DATOS (Almacenamiento SQLite)"]
+    subgraph DATA["🗄️ CAPA DE DATOS (MySQL — Aiven Cloud)"]
         direction TB
-        DB["Controlador SQLite3"]
+        DB["Motor MySQL 8.x"]
         T1[("users / usuarios")]
         T2[("courses / modulos")]
         T3[("lessons / lecciones")]
@@ -75,7 +75,7 @@ graph TB
 
     subgraph DEPLOY["☁️ INFRAESTRUCTURA Y DESPLIEGUE (Producción)"]
         RENDER["Render Cloud<br/>(Docker Web Service)"]
-        SQLITE_FILE[("Base de Datos Física<br/>/database/database.sqlite")]
+        AIVEN["Aiven Cloud<br/>(MySQL Remoto — DBaaS)"]
     end
 
     BROWSER -->|"Petición HTTP"| ROUTER
@@ -84,10 +84,10 @@ graph TB
     CONTROLLER <--> MODEL
     CONTROLLER --> VIEW
     VIEW -->|"Respuesta HTML"| BROWSER
-    MODEL <-->|"Eloquent ORM / SQLite Driver"| DB
+    MODEL <-->|"Eloquent ORM / PDO MySQL"| DB
     DB --- T1 & T2 & T3 & T4 & T5 & T6
     LARAVEL -.->|"Despliegue de Contenedor"| RENDER
-    RENDER <--> SQLITE_FILE
+    DATA -.->|"Conexión SSL"| AIVEN
 ```
 
 ---
@@ -176,7 +176,7 @@ sequenceDiagram
 
     E->>V: Selecciona lección activa en el mapa
     V->>EC: GET /student/lessons/{id}
-    EC->>DB: Carga contenido, preguntas y opciones de la lección
+    EC->>DB: SELECT contenido, preguntas y opciones de la lección
     DB-->>EC: Datos de la lección
     EC-->>V: Renderiza la lección e inicia el quiz
 
@@ -184,7 +184,7 @@ sequenceDiagram
     V->>EC: POST /student/lessons/{id}/complete
 
     EC->>EC: Valida respuestas en el servidor y procesa XP
-    EC->>DB: Registra lección completada (lesson_completions) y suma XP al usuario
+    EC->>DB: INSERT lesson_completions + UPDATE XP del usuario
     
     alt Respuestas 100% correctas
         EC-->>V: Desbloquea siguiente lección en el mapa + XP añadida
@@ -340,7 +340,8 @@ erDiagram
 |---|---|---|---|
 | **Backend Core** | Laravel | v11.x | Framework principal MVC de la aplicación |
 | **Lenguaje Servidor** | PHP | 8.4 | Lenguaje del lado del servidor utilizado |
-| **Base de Datos** | SQLite | 3.x | Base de datos relacional ligera y portable |
+| **Base de Datos** | MySQL | 8.x | Motor de base de datos relacional en la nube |
+| **DBaaS Cloud** | Aiven Cloud | — | Hosting gestionado de MySQL (conexión SSL) |
 | **Frontend Engine** | Blade | — | Motor de plantillas dinámicas de Laravel |
 | **Maquetado y Estilos** | CSS / Tailwind CSS | — | Framework de estilos y responsive design militar |
 | **Autenticación Externa** | Google OAuth | — | Login social seguro para usuarios registrados |
@@ -372,7 +373,7 @@ Para fines de pruebas locales y demostración del sistema, el seeder crea los si
 ### Requisitos Previos
 1. **PHP 8.4** instalado en el sistema.
 2. **Composer 2.x** configurado en PATH.
-3. **SQLite3** habilitado en la configuración de PHP (`php.ini`).
+3. **MySQL 8.x** (o una cuenta en [Aiven Cloud](https://aiven.io/) para la base de datos remota gratuita).
 4. **Git** para control de código.
 
 ### Pasos de Configuración
@@ -391,11 +392,9 @@ cp .env.example .env
 # 4. Generar la clave única de encriptación
 php artisan key:generate
 
-# 5. Crear el archivo vacío de SQLite
-# (En Windows PowerShell)
-New-Item -ItemType File -Path database\database.sqlite -Force
-# (En Linux/macOS o Git Bash)
-touch database/database.sqlite
+# 5. Configurar la conexión MySQL en el archivo .env
+#    Editar .env y completar: DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD
+#    (Usar credenciales del servicio MySQL en Aiven Cloud)
 
 # 6. Correr las migraciones y poblar con datos iniciales (seeder)
 php artisan migrate --seed
