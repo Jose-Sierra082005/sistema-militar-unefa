@@ -728,6 +728,15 @@
                         </div>
                     </a>
                 </li>
+                <li class="sidebar-item {{ Request::routeIs('admin.profile.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.profile.show') }}">
+                        <div class="sidebar-link-content">
+                            <i class="fa-solid fa-user-gear"></i>
+                            <span>Configuración Perfil</span>
+                        </div>
+                        <span class="module-badge badge-active" style="background: rgba(212,175,55,0.15); border-color: var(--accent-gold); color: var(--accent-gold-hover);">Ajustes</span>
+                    </a>
+                </li>
                 <li class="sidebar-item {{ Request::routeIs('admin.personnel.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.personnel.index') }}">
                         <div class="sidebar-link-content">

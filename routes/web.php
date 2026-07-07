@@ -2,6 +2,7 @@
 
 // Cambio demostrativo para el video del Avance 3
 
+use App\Http\Controllers\AdminProfileController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EvaluationController;
@@ -119,6 +120,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/evaluations', [EvaluationController::class, 'index'])->name('evaluations.index');
     Route::post('/evaluations', [EvaluationController::class, 'store'])->name('evaluations.store');
     Route::delete('/evaluations/{id}', [EvaluationController::class, 'destroy'])->name('evaluations.destroy');
+
+    // Perfil del Administrador
+    Route::get('/profile', [AdminProfileController::class, 'showProfile'])->name('profile.show');
+    Route::post('/profile/update', [AdminProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/password', [AdminProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::post('/profile/2fa/activate', [AdminProfileController::class, 'activate2FA'])->name('profile.2fa.activate');
+    Route::post('/profile/2fa/disable-send', [AdminProfileController::class, 'send2FADisableOtp'])->name('profile.2fa.disable.send');
+    Route::post('/profile/2fa/disable-confirm', [AdminProfileController::class, 'disable2FA'])->name('profile.2fa.disable.confirm');
 });
 
 // Rutas de Estudiantes Protegidas por Autenticación y Rol

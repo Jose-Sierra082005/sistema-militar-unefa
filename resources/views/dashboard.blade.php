@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', 'Panel de Control - Tactic Force')
 
@@ -426,7 +426,7 @@
             <i class="fa-solid fa-shield-halved" style="font-size: 1.4rem;"></i>
             <div>
                 <strong>ALERTA DE SEGURIDAD GENERAL:</strong> Su perfil se encuentra incompleto o sin doble factor de autenticación activo. 
-                Para cumplir el protocolo militar, complete su <a href="#seccion-seguridad" style="color: var(--accent-gold-hover); font-weight: 700; text-decoration: underline;">configuración de seguridad</a> obligatoria al final de la página.
+                Para cumplir el protocolo militar, complete su <a href="{{ route('admin.profile.show') }}" style="color: var(--accent-gold-hover); font-weight: 700; text-decoration: underline;">configuración de seguridad</a> obligatoria.
             </div>
         </div>
     @endif
