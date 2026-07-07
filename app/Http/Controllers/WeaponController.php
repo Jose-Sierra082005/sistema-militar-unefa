@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Weapon;
 use App\Models\MilitaryPersonnel;
+use App\Models\Weapon;
+use Illuminate\Http\Request;
 
 class WeaponController extends Controller
 {
@@ -14,12 +14,12 @@ class WeaponController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('serial', 'like', "%{$search}%")
-                  ->orWhere('type', 'like', "%{$search}%")
-                  ->orWhere('model', 'like', "%{$search}%")
-                  ->orWhere('condition', 'like', "%{$search}%")
-                  ->orWhere('status', 'like', "%{$search}%");
+                    ->orWhere('type', 'like', "%{$search}%")
+                    ->orWhere('model', 'like', "%{$search}%")
+                    ->orWhere('condition', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%");
             });
         }
 
@@ -31,6 +31,7 @@ class WeaponController extends Controller
     public function create()
     {
         $personnel = MilitaryPersonnel::orderBy('name', 'asc')->get();
+
         return view('admin.armory.create', compact('personnel'));
     }
 
@@ -56,6 +57,7 @@ class WeaponController extends Controller
     {
         $weapon = Weapon::findOrFail($id);
         $personnel = MilitaryPersonnel::orderBy('name', 'asc')->get();
+
         return view('admin.armory.edit', compact('weapon', 'personnel'));
     }
 
@@ -64,7 +66,7 @@ class WeaponController extends Controller
         $weapon = Weapon::findOrFail($id);
 
         $request->validate([
-            'serial' => 'required|string|unique:weapons,serial,' . $weapon->id,
+            'serial' => 'required|string|unique:weapons,serial,'.$weapon->id,
             'type' => 'required|string',
             'model' => 'required|string',
             'condition' => 'required|string',

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Course;
 use App\Models\Evaluation;
 use App\Models\MilitaryPersonnel;
-use App\Models\Course;
+use Illuminate\Http\Request;
 
 class EvaluationController extends Controller
 {
@@ -15,20 +15,20 @@ class EvaluationController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('evaluator', 'like', "%{$search}%")
-                  ->orWhereHas('course', function($qc) use ($search) {
-                      $qc->where('title', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('personnel', function($qp) use ($search) {
-                      $qp->where('name', 'like', "%{$search}%")
-                        ->orWhere('cedula', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('course', function ($qc) use ($search) {
+                        $qc->where('title', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('personnel', function ($qp) use ($search) {
+                        $qp->where('name', 'like', "%{$search}%")
+                            ->orWhere('cedula', 'like', "%{$search}%");
+                    });
             });
         }
 
         $evaluations = $query->orderBy('date', 'desc')
-                             ->paginate(10);
+            ->paginate(10);
 
         // Get personnel for evaluations assignment dropdown
         $personnel = MilitaryPersonnel::orderBy('name', 'asc')->get();

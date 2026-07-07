@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\GuardShift;
 use App\Models\MilitaryPersonnel;
+use Illuminate\Http\Request;
 
 class GuardDutyController extends Controller
 {
@@ -14,25 +14,25 @@ class GuardDutyController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('post', 'like', "%{$search}%")
-                  ->orWhere('shift_time', 'like', "%{$search}%")
-                  ->orWhere('status', 'like', "%{$search}%")
-                  ->orWhereHas('personnel', function($qp) use ($search) {
-                      $qp->where('name', 'like', "%{$search}%")
-                        ->orWhere('cedula', 'like', "%{$search}%");
-                  });
+                    ->orWhere('shift_time', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
+                    ->orWhereHas('personnel', function ($qp) use ($search) {
+                        $qp->where('name', 'like', "%{$search}%")
+                            ->orWhere('cedula', 'like', "%{$search}%");
+                    });
             });
         }
 
         $shifts = $query->orderBy('date', 'desc')
-                        ->orderBy('shift_time', 'asc')
-                        ->paginate(10);
+            ->orderBy('shift_time', 'asc')
+            ->paginate(10);
 
         // Get active personnel for assignment dropdown
         $personnel = MilitaryPersonnel::where('status', 'Activo')
-                                      ->orderBy('name', 'asc')
-                                      ->get();
+            ->orderBy('name', 'asc')
+            ->get();
 
         return view('admin.guards.index', compact('shifts', 'personnel'));
     }

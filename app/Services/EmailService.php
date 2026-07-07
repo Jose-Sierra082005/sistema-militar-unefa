@@ -9,11 +9,6 @@ class EmailService
 {
     /**
      * Send OTP reset code to user via Resend API
-     *
-     * @param string $email
-     * @param string $name
-     * @param string $otp
-     * @return bool
      */
     public static function sendOtpEmail(string $email, string $name, string $otp): bool
     {
@@ -103,11 +98,11 @@ class EmailService
                     <div class="subtitle">CONFIDENCIALIDAD Y SEGURIDAD NACIONAL</div>
                 </div>
                 <div class="content">
-                    <p>Estimado Oficial <strong>' . htmlspecialchars($name) . '</strong>,</p>
+                    <p>Estimado Oficial <strong>'.htmlspecialchars($name).'</strong>,</p>
                     <p>Se ha iniciado una solicitud de recuperación de contraseña de acceso para su cuenta registrada en la plataforma Tactic Force.</p>
                     <p>Para autorizar esta acción y establecer una nueva clave, ingrese el siguiente código único de seguridad en la pantalla de verificación del sistema:</p>
                     
-                    <div class="otp-box">' . htmlspecialchars($otp) . '</div>
+                    <div class="otp-box">'.htmlspecialchars($otp).'</div>
                     
                     <p>Este código OTP tiene una <strong>validez de 15 minutos</strong> y puede ser utilizado una única vez. Si usted no ha iniciado este proceso, ignore este correo inmediatamente y reporte la novedad al oficial de seguridad informática.</p>
                     
@@ -137,13 +132,16 @@ class EmailService
 
             if ($response->successful()) {
                 Log::info("OTP reset email sent successfully to {$email}");
+
                 return true;
             } else {
-                Log::error("Failed to send OTP email via Resend to {$email}. Error: " . $response->body());
+                Log::error("Failed to send OTP email via Resend to {$email}. Error: ".$response->body());
+
                 return false;
             }
         } catch (\Exception $e) {
-            Log::error("Exception occurred while sending OTP email: " . $e->getMessage());
+            Log::error('Exception occurred while sending OTP email: '.$e->getMessage());
+
             return false;
         }
     }

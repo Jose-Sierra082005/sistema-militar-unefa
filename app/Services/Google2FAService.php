@@ -15,6 +15,7 @@ class Google2FAService
         for ($i = 0; $i < $length; $i++) {
             $secret .= self::$base32chars[random_int(0, 31)];
         }
+
         return $secret;
     }
 
@@ -39,7 +40,7 @@ class Google2FAService
     {
         $otpauth = self::getQRCodeUrl($name, $email, $secret, $issuer);
 
-        return 'https://api.qrserver.com/v1/create-qr-code/?size=' . $size . 'x' . $size . '&data=' . rawurlencode($otpauth);
+        return 'https://api.qrserver.com/v1/create-qr-code/?size='.$size.'x'.$size.'&data='.rawurlencode($otpauth);
     }
 
     /**
@@ -85,21 +86,22 @@ class Google2FAService
         $secretKey = self::base32Decode($secret);
 
         // Pack time slice into 8-byte big-endian binary string
-        $timeBin = pack('N*', 0) . pack('N*', (int) $timeSlice);
+        $timeBin = pack('N*', 0).pack('N*', (int) $timeSlice);
 
         // HMAC-SHA1
         $hash = hash_hmac('sha1', $timeBin, $secretKey, true);
 
         // Dynamic Truncation
-        $offset = ord($hash[19]) & 0xf;
+        $offset = ord($hash[19]) & 0xF;
         $truncatedHash = (
-            (ord($hash[$offset]) & 0x7f) << 24 |
-            (ord($hash[$offset + 1]) & 0xff) << 16 |
-            (ord($hash[$offset + 2]) & 0xff) << 8 |
-            (ord($hash[$offset + 3]) & 0xff)
+            (ord($hash[$offset]) & 0x7F) << 24 |
+            (ord($hash[$offset + 1]) & 0xFF) << 16 |
+            (ord($hash[$offset + 2]) & 0xFF) << 8 |
+            (ord($hash[$offset + 3]) & 0xFF)
         );
 
         $otp = $truncatedHash % 1000000;
+
         return str_pad($otp, 6, '0', STR_PAD_LEFT);
     }
 
@@ -109,11 +111,11 @@ class Google2FAService
     private static function base32Decode($base32)
     {
         $base32 = strtoupper($base32);
-        
+
         // Remove padding characters
         $base32 = str_replace('=', '', $base32);
-        
-        if (!preg_match('/^[A-Z2-7]+$/', $base32)) {
+
+        if (! preg_match('/^[A-Z2-7]+$/', $base32)) {
             throw new \Exception('Invalid base32 character.');
         }
 
@@ -122,7 +124,7 @@ class Google2FAService
 
         $val = 0;
         $valLen = 0;
-        
+
         for ($i = 0; $i < strlen($base32); $i++) {
             $val = ($val << 5) | $lut[$base32[$i]];
             $valLen += 5;
@@ -131,7 +133,7 @@ class Google2FAService
                 $binary .= chr(($val >> $valLen) & 0xFF);
             }
         }
-        
+
         return $binary;
     }
 }

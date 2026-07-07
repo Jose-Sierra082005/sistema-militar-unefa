@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\MilitaryPersonnel;
+use Illuminate\Http\Request;
 
 class MilitaryPersonnelController extends Controller
 {
@@ -13,11 +13,11 @@ class MilitaryPersonnelController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('cedula', 'like', "%{$search}%")
-                  ->orWhere('rank', 'like', "%{$search}%")
-                  ->orWhere('role', 'like', "%{$search}%");
+                    ->orWhere('cedula', 'like', "%{$search}%")
+                    ->orWhere('rank', 'like', "%{$search}%")
+                    ->orWhere('role', 'like', "%{$search}%");
             });
         }
 
@@ -53,6 +53,7 @@ class MilitaryPersonnelController extends Controller
     public function edit($id)
     {
         $person = MilitaryPersonnel::findOrFail($id);
+
         return view('admin.personnel.edit', compact('person'));
     }
 
@@ -62,7 +63,7 @@ class MilitaryPersonnelController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'cedula' => 'required|string|unique:military_personnel,cedula,' . $person->id,
+            'cedula' => 'required|string|unique:military_personnel,cedula,'.$person->id,
             'rank' => 'required|string',
             'role' => 'required|string',
             'status' => 'required|string',

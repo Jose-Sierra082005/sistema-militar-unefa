@@ -2,18 +2,18 @@
 
 // Cambio demostrativo para el video del Avance 3
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\GoogleAuthController;
-use App\Http\Controllers\MilitaryPersonnelController;
-use App\Http\Controllers\WeaponController;
-use App\Http\Controllers\GuardDutyController;
-use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\EvaluationController;
+use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\GuardDutyController;
+use App\Http\Controllers\MilitaryPersonnelController;
 use App\Http\Controllers\StudentPortalController;
-use App\Models\User;
+use App\Http\Controllers\WeaponController;
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Models\User;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     if (auth()->check() && auth()->user()->role === 'admin') {
@@ -23,6 +23,7 @@ Route::get('/', function () {
 
         return view('dashboard', compact('studentCount', 'courseCount', 'lessonCount'));
     }
+
     return redirect()->route('student.dashboard');
 })->middleware('auth')->name('dashboard');
 
@@ -137,6 +138,6 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::post('/profile/password', [StudentPortalController::class, 'updatePassword'])->name('profile.password');
 
     // Desactivacion del Doble Factor (2FA) con verificacion OTP por correo
-    Route::post('/profile/2fa/disable-send',    [StudentPortalController::class, 'send2FADisableOtp'])->name('profile.2fa.disable.send');
+    Route::post('/profile/2fa/disable-send', [StudentPortalController::class, 'send2FADisableOtp'])->name('profile.2fa.disable.send');
     Route::post('/profile/2fa/disable-confirm', [StudentPortalController::class, 'disable2FA'])->name('profile.2fa.disable.confirm');
 });

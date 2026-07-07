@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Exception;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
+use Symfony\Component\HttpFoundation\Response;
 
 class GoogleAuthController extends Controller
 {
     /**
      * Redirect the user to the Google authentication page.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function redirectToGoogle()
     {
@@ -25,7 +25,7 @@ class GoogleAuthController extends Controller
     /**
      * Obtain the user information from Google and log them in.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function handleGoogleCallback()
     {
@@ -67,10 +67,10 @@ class GoogleAuthController extends Controller
             }
 
             // Check if user has Two-Factor Authentication enabled
-            if ($user->two_factor_enabled && !empty($user->two_factor_secret)) {
+            if ($user->two_factor_enabled && ! empty($user->two_factor_secret)) {
                 session([
                     'auth.2fa.user_id' => $user->id,
-                    'auth.2fa.remember' => true
+                    'auth.2fa.remember' => true,
                 ]);
 
                 return redirect()->route('two-factor.verify')->with('info', 'Autenticación de Doble Factor requerida.');
@@ -82,7 +82,7 @@ class GoogleAuthController extends Controller
             return redirect()->intended('/')->with('success', '¡Conexión segura establecida con éxito usando Google!');
         } catch (Exception $e) {
             return redirect()->route('login')->withErrors([
-                'email' => 'Hubo un problema al autenticar con Google: ' . $e->getMessage()
+                'email' => 'Hubo un problema al autenticar con Google: '.$e->getMessage(),
             ]);
         }
     }
