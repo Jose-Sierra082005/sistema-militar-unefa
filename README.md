@@ -12,7 +12,7 @@
 
 ## 📝 Descripción del Proyecto
 
-**Tactic Force** es una plataforma educativa interactiva tipo LMS (Learning Management System) diseñada para la formación cívico-militar de estudiantes universitarios de la **UNEFA Núcleo Falcón** (Venezuela). La aplicación ha sido reestructurada y optimizada para ofrecer una experiencia gamificada y un panel de gestión integral y profesional.
+**Tactic Force** es una plataforma educativa interactiva tipo LMS (Learning Management System) orientada a la formación cívico-militar de **estudiantes universitarios** en conocimientos militares y estrategias tácticas. La aplicación ofrece una experiencia gamificada de aprendizaje y un panel de gestión integral diseñado para instituciones de educación superior con componente militar.
 
 El sistema se divide en dos grandes áreas funcionales:
 
@@ -132,33 +132,35 @@ Muestra el flujo cronológico de mensajes al iniciar sesión y validar el códig
 
 ```mermaid
 sequenceDiagram
-    actor U as Usuario (Estudiante/Admin)
-    participant B as Blade (Vista Login)
+    actor U as Usuario
+    participant B as Vista Login
     participant M as AuthController
-    participant DB as Base de Datos SQLite
+    participant DB as Base de Datos MySQL
 
-    U->>B: Ingresa cédula/correo y contraseña
-    B->>M: POST /login (credenciales)
-    M->>DB: Busca registro del usuario
-    DB-->>M: Retorna información del usuario
+    U->>B: Ingresa cedula/correo y contrasena
+    B->>M: POST /login
+    M->>DB: Consulta registro del usuario
+    DB-->>M: Retorna datos del usuario
 
-    alt Credenciales Correctas
-        M->>M: Valida hash de la contraseña
-        alt 2FA Habilitado
-            M-->>B: Redirige a formulario 2FA (/two-factor/verify)
-            U->>B: Introduce código TOTP (6 dígitos)
+    alt Credenciales validas
+        M->>M: Valida hash de la contrasena
+        M-->>B: Verifica estado 2FA
+        alt 2FA habilitado
+            M-->>B: Redirige a /two-factor/verify
+            U->>B: Ingresa codigo TOTP de 6 digitos
             B->>M: POST /two-factor/verify
+            M-->>B: Codigo validado correctamente
         end
-        M-->>B: Inicia sesión (Auth::login)
-        alt Rol: Admin
-            M-->>B: Redirige al Panel de Control (/)
-        else Rol: Estudiante
-            M-->>B: Redirige al Portal Estudiante (/student/dashboard)
+        M-->>B: Auth login exitoso
+        alt Rol admin
+            M-->>B: Redirige al panel de control
+        else Rol estudiante
+            M-->>B: Redirige al portal estudiantil
         end
-        B-->>U: Muestra Dashboard del usuario
-    else Credenciales Incorrectas
-        M-->>B: Retorna error de credenciales
-        B-->>U: Muestra mensaje "Credenciales inválidas"
+        B-->>U: Muestra Dashboard personalizado
+    else Credenciales incorrectas
+        M-->>B: Error de autenticacion
+        B-->>U: Mensaje de credenciales invalidas
     end
 ```
 
@@ -170,26 +172,25 @@ Representa el flujo de avance cuando un estudiante interactúa con el mapa Duoli
 ```mermaid
 sequenceDiagram
     actor E as Estudiante
-    participant V as Vista Curso (Blade)
+    participant V as Vista del Curso
     participant EC as CourseController
-    participant DB as Base de Datos SQLite
+    participant DB as Base de Datos MySQL
 
-    E->>V: Selecciona lección activa en el mapa
-    V->>EC: GET /student/lessons/{id}
-    EC->>DB: SELECT contenido, preguntas y opciones de la lección
-    DB-->>EC: Datos de la lección
-    EC-->>V: Renderiza la lección e inicia el quiz
+    E->>V: Selecciona leccion activa en el mapa
+    V->>EC: GET /student/lessons/id
+    EC->>DB: SELECT leccion, preguntas y opciones
+    DB-->>EC: Datos de la leccion
+    EC-->>V: Renderiza leccion e inicia el quiz
 
-    E->>V: Responde el quiz interactivo y lo envía
-    V->>EC: POST /student/lessons/{id}/complete
+    E->>V: Responde el quiz y envia formulario
+    V->>EC: POST /student/lessons/id/complete
+    EC->>EC: Valida respuestas y calcula XP
+    EC->>DB: INSERT lesson_completions y UPDATE xp del usuario
 
-    EC->>EC: Valida respuestas en el servidor y procesa XP
-    EC->>DB: INSERT lesson_completions + UPDATE XP del usuario
-    
-    alt Respuestas 100% correctas
-        EC-->>V: Desbloquea siguiente lección en el mapa + XP añadida
-    else Respuestas incorrectas
-        EC-->>V: Muestra errores y permite reintentar el quiz
+    alt Aprobado
+        EC-->>V: Desbloquea siguiente leccion y muestra XP ganada
+    else Reprobado
+        EC-->>V: Muestra errores y permite reintentar
     end
 ```
 
@@ -347,24 +348,25 @@ erDiagram
 | **Autenticación Externa** | Google OAuth | — | Login social seguro para usuarios registrados |
 | **Doble Factor (2FA)** | Google Authenticator | — | Generación de tokens OTP y sincronización QR |
 | **Contenedores** | Docker | — | Empaquetado del software para el despliegue |
-| **Servidor de Producción** | Render Cloud | — | Hosting web del contenedor y base de datos SQLite |
+| **Servidor de Producción** | Render Cloud | — | Hosting web del contenedor Docker en producción |
 | **Suite de Pruebas** | PHPUnit / Feature Tests | 10.x | Pruebas de integración para autenticación, 2FA y CMS |
 
 ---
 
-## 🔑 Credenciales por Defecto (Entornos de Desarrollo y Demo)
+## 🔑 Acceso al Sistema (Demo)
 
-Para fines de pruebas locales y demostración del sistema, el seeder crea los siguientes accesos:
+El seeder del proyecto crea cuentas de prueba automáticamente al ejecutar `php artisan migrate --seed`. Las credenciales reales de producción **no se incluyen aquí por razones de seguridad** — deben ser configuradas por el administrador del sistema en el archivo `.env` y en el seeder correspondiente.
 
 ### 👤 Portal del Estudiante (`/login`)
-* **Estudiante de Prueba**: `estudiante@unefa.edu.ve`
-* **Contraseña**: `Student123!`
-
-* **Estudiante Desarrollador (Soporta Google Login)**: `programador082005@gmail.com`
+* **Email**: La cuenta demo se define en `database/seeders/StudentPortalSeeder.php`
+* **Contraseña**: Configurada en el seeder (ver archivo mencionado)
+* **Inicio de sesión alternativo**: Google OAuth disponible
 
 ### 🛡️ Portal del Administrador (`/admin/login`)
-* **Administrador Principal**: `admin@unefa.edu.ve`
-* **Contraseña**: `Admin123!` *(Fallback de respaldo: `password123`)*
+* **Email**: Definido en `database/seeders/DatabaseSeeder.php`
+* **Contraseña**: Configurada por el administrador del proyecto
+
+> ⚠️ **Nota de seguridad:** Si vas a desplegar este proyecto, asegúrate de cambiar las credenciales del seeder y definir contraseñas robustas antes del primer deploy en producción.
 
 ---
 
