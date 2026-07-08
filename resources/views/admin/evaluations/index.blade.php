@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Analítica de Progreso — Tactic Force')
+@section('title', 'Progreso Estudiantil — Tactic Force')
 
 @section('styles')
 <style>
@@ -273,10 +273,10 @@
 {{-- Page Header --}}
 <div style="margin-bottom: 24px;">
     <h2 style="font-family:'Share Tech Mono',monospace; font-size:1.8rem; text-transform:uppercase; color:var(--accent-gold); letter-spacing:1px;">
-        <i class="fa-solid fa-chart-line" style="margin-right:10px;"></i>Analítica de Progreso Estudiantil
+        <i class="fa-solid fa-chart-line" style="margin-right:10px;"></i>Progreso Estudiantil
     </h2>
     <p style="color:var(--text-secondary); font-size:0.9rem; margin-top:4px;">
-        Historial de lecciones completadas, XP acumulado y precisión por quiz de cada estudiante. Los datos son generados automáticamente por el sistema.
+        Historial de lecciones completadas, XP acumulado y precisión por quiz de cada estudiante registrado. Los datos son generados automáticamente por el sistema.
     </p>
 </div>
 

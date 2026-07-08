@@ -737,15 +737,7 @@
                         <span class="module-badge badge-active" style="background: rgba(212,175,55,0.15); border-color: var(--accent-gold); color: var(--accent-gold-hover);">Ajustes</span>
                     </a>
                 </li>
-                <li class="sidebar-item {{ Request::routeIs('admin.personnel.*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.personnel.index') }}">
-                        <div class="sidebar-link-content">
-                            <i class="fa-solid fa-user-shield"></i>
-                            <span>Fichero Académico</span>
-                        </div>
-                        <span class="module-badge badge-active">Activo</span>
-                    </a>
-                </li>
+
                 <li class="sidebar-item {{ Request::routeIs('admin.courses.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.courses.index') }}">
                         <div class="sidebar-link-content">
@@ -759,8 +751,8 @@
                 <li class="sidebar-item {{ Request::routeIs('admin.evaluations.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.evaluations.index') }}">
                         <div class="sidebar-link-content">
-                            <i class="fa-solid fa-file-signature"></i>
-                            <span>Evaluaciones</span>
+                            <i class="fa-solid fa-chart-line"></i>
+                            <span>Progreso Estudiantil</span>
                         </div>
                         <span class="module-badge badge-active">Activo</span>
                     </a>
