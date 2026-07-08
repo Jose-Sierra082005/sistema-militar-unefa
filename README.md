@@ -23,9 +23,10 @@ El sistema se divide en dos grandes áreas funcionales:
 * **Seguridad y Perfil**: Activación y desactivación de autenticación de doble factor (2FA), cambio de contraseña y soporte para autenticación con Google OAuth.
 
 ### 🛡️ Panel del Administrador (CMS Táctico)
+* **Panel Principal**: Vista general del sistema con estadísticas rápidas de cursos, lecciones y progreso de los estudiantes.
 * **Gestión CMS de Contenidos**: Editor visual completo para la creación y edición de cursos, lecciones (con vista previa en vivo en HTML y soporte de etiquetas seguras) y banco de preguntas para los cuestionarios.
-* **Fichero Académico e Infraestructura**: Administración de personal militar, control y asignación del Parque de Armas (Armería), programación de roles de guardia y bitácora detallada de accesos para auditorías.
-* **Control de Categorías**: Organización de temarios clasificados en Doctrina General, Operaciones Terrestres, entre otras.
+* **Progreso Estudiantil**: Análisis estadístico del historial de evaluaciones por estudiante, incluyendo XP acumulado, precisión por lección y progreso por curso.
+* **Configuración de Perfil**: Módulo de administración de las credenciales y datos del perfil del Comandante/Administrador del sistema.
 
 ---
 
@@ -58,19 +59,19 @@ graph TB
         ROUTER["Router<br/>routes/web.php"]
         MIDDLEWARE["Middleware de Seguridad<br/>Auth / RoleMiddleware / 2FA"]
         CONTROLLER["Controladores del Sistema<br/>CourseController · AuthController<br/>StudentPortalController"]
-        MODEL["Modelos Eloquent<br/>User · Course · Lesson<br/>Question · Option · Evaluation"]
+        MODEL["Modelos Eloquent<br/>User · Course · Lesson<br/>Question · Option · LessonCompletion"]
         VIEW["Vistas Blade + Tailwind CSS<br/>Layouts · Partials · Dashboard"]
     end
 
     subgraph DATA["🗄️ CAPA DE DATOS (MySQL — Aiven Cloud)"]
         direction TB
         DB["Motor MySQL 8.x"]
-        T1[("users / usuarios")]
-        T2[("courses / modulos")]
-        T3[("lessons / lecciones")]
-        T4[("questions / preguntas")]
-        T5[("options / alternativas")]
-        T6[("evaluations / evaluaciones")]
+        T1[("users")]
+        T2[("courses")]
+        T3[("lessons")]
+        T4[("questions")]
+        T5[("options")]
+        T6[("lesson_completions")]
     end
 
     subgraph DEPLOY["☁️ INFRAESTRUCTURA Y DESPLIEGUE (Producción)"]
@@ -107,9 +108,9 @@ graph LR
         UC4["Presentar Quizzes Gamificados (XP)"]
         UC5["Gestionar Perfil y Activar 2FA"]
         UC6["Recuperar 2FA perdido vía OTP"]
-        UC7["Gestionar Personal Académico"]
-        UC8["Gestionar Parque de Armas y Guardias"]
-        UC9["CMS: Control de Cursos, Lecciones y Preguntas"]
+        UC7["CMS: Gestionar Cursos, Lecciones y Preguntas"]
+        UC8["Visualizar Progreso Estudiantil (XP y Precisión)"]
+        UC9["Configurar Perfil Administrativo"]
     end
 
     ESTUDIANTE --> UC1
@@ -173,24 +174,25 @@ Representa el flujo de avance cuando un estudiante interactúa con el mapa Duoli
 sequenceDiagram
     actor E as Estudiante
     participant V as Vista del Curso
-    participant EC as CourseController
+    participant SPC as StudentPortalController
     participant DB as Base de Datos MySQL
 
     E->>V: Selecciona leccion activa en el mapa
-    V->>EC: GET /student/lessons/id
-    EC->>DB: SELECT leccion, preguntas y opciones
-    DB-->>EC: Datos de la leccion
-    EC-->>V: Renderiza leccion e inicia el quiz
+    V->>SPC: GET /student/lessons/{id}
+    SPC->>DB: SELECT lessons, questions y options
+    DB-->>SPC: Datos de la leccion
+    SPC-->>V: Renderiza leccion e inicia el quiz
 
     E->>V: Responde el quiz y envia formulario
-    V->>EC: POST /student/lessons/id/complete
-    EC->>EC: Valida respuestas y calcula XP
-    EC->>DB: INSERT lesson_completions y UPDATE xp del usuario
+    V->>SPC: POST /student/quiz/{lesson_id}/complete
+    SPC->>SPC: Valida respuestas, calcula XP y accuracy_percent
 
-    alt Aprobado
-        EC-->>V: Desbloquea siguiente leccion y muestra XP ganada
-    else Reprobado
-        EC-->>V: Muestra errores y permite reintentar
+    alt Primera vez completada
+        SPC->>DB: INSERT lesson_completions (xp_earned, accuracy_percent)
+        SPC->>DB: UPDATE users SET points = points + xp_earned
+        SPC-->>V: Desbloquea siguiente leccion y muestra XP ganada y precision
+    else Leccion ya completada (repaso)
+        SPC-->>V: Muestra repaso sin sumar puntos
     end
 ```
 
@@ -258,79 +260,91 @@ flowchart TD
 
 ---
 
-### 7. Esquema Conceptual de la Base de Datos (6 Tablas Académicas)
-Para fines de la defensa académica del proyecto de grado ante la UNEFA, se modela conceptualmente la base de datos bajo un esquema unificado de 6 entidades óptimas:
+### 7. Esquema de la Base de Datos Real (MySQL — Aiven Cloud)
+Las siguientes tablas representan el esquema real de la base de datos MySQL desplegada en Aiven Cloud, derivadas directamente de las migraciones de Laravel del proyecto:
 
 ```mermaid
 erDiagram
-    usuarios {
+    users {
         bigint id PK
-        string nombre
+        string google_id UK
+        string name
         string cedula UK
         string email UK
         string password
-        enum rol
-        enum estado
-        string google_id
-        string google2fa_secret
-        boolean google2fa_enabled
-        integer xp
-        string rango
+        text two_factor_secret
+        boolean two_factor_enabled
+        string role
+        int points
+        text google_token
+        text google_refresh_token
+        timestamp email_verified_at
+        string remember_token
+        timestamp created_at
+        timestamp updated_at
     }
 
-    modulos {
+    courses {
         bigint id PK
-        string titulo
-        text contenido
-        string pdf_path
-        int orden UK
-        enum estado
+        string title
+        text description
+        string category
+        string difficulty
+        timestamp created_at
+        timestamp updated_at
     }
 
-    preguntas {
+    lessons {
         bigint id PK
-        bigint modulo_id FK
-        text enunciado
-        string opcion_a
-        string opcion_b
-        string opcion_c
-        string opcion_d
-        char respuesta_correcta
-        decimal puntaje
+        bigint course_id FK
+        string title
+        longtext content
+        int order
+        timestamp created_at
+        timestamp updated_at
     }
 
-    resultados_evaluaciones {
+    questions {
         bigint id PK
-        bigint usuario_id FK
-        bigint modulo_id FK
-        decimal nota_obtenida
-        enum estado
-        int intentos
-        timestamp fecha_evaluacion
+        bigint lesson_id FK
+        text question_text
+        int points
+        timestamp created_at
+        timestamp updated_at
     }
 
-    progresos {
+    options {
         bigint id PK
-        bigint usuario_id FK
-        bigint modulo_id FK
-        tinyint completado
+        bigint question_id FK
+        text option_text
+        boolean is_correct
+        timestamp created_at
+        timestamp updated_at
     }
 
-    bitacora_accesos {
+    lesson_completions {
         bigint id PK
-        bigint usuario_id FK
-        string accion
-        string ip_address
-        text user_agent
+        bigint user_id FK
+        bigint lesson_id FK
+        smallint xp_earned
+        tinyint accuracy_percent
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    password_reset_otps {
+        bigint id PK
+        string email
+        string otp
+        timestamp expires_at
         timestamp created_at
     }
 
-    usuarios ||--o{ resultados_evaluaciones : "tiene"
-    usuarios ||--o{ progresos : "registra"
-    usuarios ||--o{ bitacora_accesos : "genera"
-    modulos ||--o{ preguntas : "contiene"
-    modulos ||--o{ resultados_evaluaciones : "pertenece_a"
-    modulos ||--o{ progresos : "tiene_progreso"
+    users ||--o{ lesson_completions : "completa"
+    courses ||--o{ lessons : "contiene"
+    lessons ||--o{ questions : "tiene"
+    lessons ||--o{ lesson_completions : "registrada_en"
+    questions ||--o{ options : "tiene"
 ```
 
 ---

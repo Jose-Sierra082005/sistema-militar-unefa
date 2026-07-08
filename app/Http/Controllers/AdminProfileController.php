@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
-use App\Models\Evaluation;
+use App\Models\LessonCompletion;
 use App\Models\User;
 use App\Services\EmailService;
 use App\Services\Google2FAService;
@@ -30,9 +30,9 @@ class AdminProfileController extends Controller
         $user = Auth::user();
         $studentCount = User::where('role', 'student')->count();
         $courseCount = Course::count();
-        $evaluationCount = Evaluation::count();
+        $lessonCompletionCount = LessonCompletion::count();
 
-        return view('admin.profile.index', compact('user', 'studentCount', 'courseCount', 'evaluationCount'));
+        return view('admin.profile.index', compact('user', 'studentCount', 'courseCount', 'lessonCompletionCount'));
     }
 
     /**

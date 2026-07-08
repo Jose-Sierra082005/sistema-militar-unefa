@@ -213,7 +213,7 @@
             <div class="stat-grid">
                 <div class="stat-cell"><div class="stat-val">{{ $studentCount }}</div><div class="stat-lbl">Estudiantes</div></div>
                 <div class="stat-cell"><div class="stat-val">{{ $courseCount }}</div><div class="stat-lbl">Cursos</div></div>
-                <div class="stat-cell"><div class="stat-val">{{ $evaluationCount }}</div><div class="stat-lbl">Evaluaciones</div></div>
+                <div class="stat-cell"><div class="stat-val">{{ $lessonCompletionCount }}</div><div class="stat-lbl">Evaluaciones</div></div>
                 <div class="stat-cell">
                     <div class="stat-val" style="font-size:.95rem;">
                         @if($has2FA)<i class="fa-solid fa-shield-halved" style="color:var(--success-green);"></i>
