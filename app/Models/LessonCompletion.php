@@ -12,6 +12,8 @@ class LessonCompletion extends Model
     protected $fillable = [
         'user_id',
         'lesson_id',
+        'xp_earned',
+        'accuracy_percent',
     ];
 
     public function user(): BelongsTo

@@ -473,6 +473,7 @@
                 action="{{ route('student.lessons.complete_quiz', $lesson->id) }}">
                 @csrf
                 <input type="hidden" name="points_earned" id="points-earned-input" value="0">
+                <input type="hidden" name="accuracy_percent" id="accuracy-input" value="0">
                 <button type="submit" class="quiz-action-btn" style="max-width: 420px; margin: 0 auto;">
                     <i class="fa-solid fa-flag-checkered"></i>
                     Registrar Progreso y Volver al Mapa
@@ -647,8 +648,9 @@
         document.getElementById('res-correct').textContent     = `${totalCorrect}/${total}`;
         document.getElementById('res-accuracy').textContent    = accuracy + '%';
 
-        // Set XP for form submission
+        // Set XP and accuracy for form submission
         document.getElementById('points-earned-input').value = totalXP;
+        document.getElementById('accuracy-input').value = accuracy;
 
         updateHUD();
     }

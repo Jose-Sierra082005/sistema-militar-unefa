@@ -351,20 +351,27 @@ class StudentPortalController extends Controller
             $alreadyDone = LessonCompletion::where('user_id', $user->id)
                 ->where('lesson_id', $lesson->id)->exists();
 
+            $pts = max(0, (int) $request->input('points_earned', 50));
+            $accuracy = max(0, min(100, (int) $request->input('accuracy_percent', 0)));
+
             if (! $alreadyDone) {
-                LessonCompletion::create(['user_id' => $user->id, 'lesson_id' => $lesson->id]);
-                $pts = (int) $request->input('points_earned', 50);
+                LessonCompletion::create([
+                    'user_id' => $user->id,
+                    'lesson_id' => $lesson->id,
+                    'xp_earned' => $pts,
+                    'accuracy_percent' => $accuracy,
+                ]);
                 $user->increment('points', $pts);
-                Log::info('[INFO] ['.now()->toDateString()."]: Estudiante {$user->email} completó la lección '{$lesson->title}' y ganó {$pts} XP.");
+                Log::info('[INFO] ['.now()->toDateString()."]: Estudiante {$user->email} completó la lección '{$lesson->title}' — XP: {$pts}, Precisión: {$accuracy}%.");
 
                 return redirect()->route('student.courses.show', $lesson->course_id)
-                    ->with('success', "Leccion '{$lesson->title}' completada. +{$pts} XP.");
+                    ->with('success', "Lección '{$lesson->title}' completada. +{$pts} XP · Precisión: {$accuracy}%.");
             }
 
             Log::info('[INFO] ['.now()->toDateString()."]: Estudiante {$user->email} repasó la lección '{$lesson->title}'.");
 
             return redirect()->route('student.courses.show', $lesson->course_id)
-                ->with('info', "Leccion '{$lesson->title}' completada (el repaso no suma puntos).");
+                ->with('info', "Lección '{$lesson->title}' repasada (el repaso no suma puntos).");
 
         } catch (\Exception $e) {
             Log::error('[ERROR] ['.now()->toDateString()."]: Fallo al completar el quiz para la lección {$lesson_id}. Detalle: ".$e->getMessage());

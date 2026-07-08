@@ -198,38 +198,17 @@ class AdminModulesTest extends TestCase
     // TESTS: MÓDULO ADMIN - EVALUACIONES
     // ══════════════════════════════════════════════════════════════════
 
-    public function test_admin_can_manage_evaluations(): void
+    public function test_admin_can_view_student_progress_analytics(): void
     {
-        $user = $this->createAdmin();
-        $personnel = $this->createMilitaryPersonnel();
+        $admin = $this->createAdmin();
 
-        $course = Course::create([
-            'title' => 'Tiro de Precisión (AK-103)',
-            'description' => 'Curso de tiro con fusil AK-103',
-            'category' => 'Armamento',
-            'difficulty' => 'Básico',
-        ]);
-
-        // Index
-        $response = $this->actingAs($user)->get(route('admin.evaluations.index'));
+        // Panel de analítica carga correctamente
+        $response = $this->actingAs($admin)->get(route('admin.evaluations.index'));
         $response->assertStatus(200);
 
-        // Store
-        $response = $this->actingAs($user)->post(route('admin.evaluations.store'), [
-            'personnel_id' => $personnel->id,
-            'course_id' => $course->id,
-            'score' => 19,
-            'evaluator' => 'Cnel. José Sierra',
-            'date' => '2026-06-14',
-            'comments' => 'Agrupación excelente.',
-        ]);
-
-        $response->assertRedirect(route('admin.evaluations.index'));
-        $this->assertDatabaseHas('evaluations', [
-            'personnel_id' => $personnel->id,
-            'course_id' => $course->id,
-            'score' => 19,
-        ]);
+        // Panel responde al filtro de búsqueda por nombre
+        $response = $this->actingAs($admin)->get(route('admin.evaluations.index', ['search' => 'Test']));
+        $response->assertStatus(200);
     }
 
     // ══════════════════════════════════════════════════════════════════

@@ -116,10 +116,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/lessons/{lesson_id}/questions', [CourseController::class, 'storeQuestion'])->name('questions.store');
     Route::delete('/questions/{id}', [CourseController::class, 'destroyQuestion'])->name('questions.destroy');
 
-    // Evaluaciones Académicas
+    // Analítica de Progreso Estudiantil (solo lectura — datos generados por el sistema)
     Route::get('/evaluations', [EvaluationController::class, 'index'])->name('evaluations.index');
-    Route::post('/evaluations', [EvaluationController::class, 'store'])->name('evaluations.store');
-    Route::delete('/evaluations/{id}', [EvaluationController::class, 'destroy'])->name('evaluations.destroy');
 
     // Perfil del Administrador
     Route::get('/profile', [AdminProfileController::class, 'showProfile'])->name('profile.show');
