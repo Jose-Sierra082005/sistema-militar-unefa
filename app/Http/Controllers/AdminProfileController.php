@@ -49,19 +49,18 @@ class AdminProfileController extends Controller
             'email' => 'required|email|unique:users,email,'.$user->id,
         ];
 
-        // Solo se valida y actualiza la cédula si no ha sido registrada previamente
-        if (empty($user->cedula)) {
+        // Solo se valida y actualiza la cédula si no ha sido registrada previamente y se ingresó un valor
+        if (empty($user->cedula) && $request->filled('cedula')) {
             $cedula = strip_tags(trim($request->cedula));
             $cleanCedula = User::normalizeCedula($cedula);
             $request->merge(['cedula' => $cleanCedula]);
-            $rules['cedula'] = 'required|string|unique:users,cedula,'.$user->id;
+            $rules['cedula'] = 'nullable|string|unique:users,cedula,'.$user->id;
         }
 
         $request->validate($rules, [
             'name.required' => 'El nombre es obligatorio.',
             'email.required' => 'El correo es obligatorio.',
             'email.unique' => 'El correo ya está en uso.',
-            'cedula.required' => 'La cédula es obligatoria.',
             'cedula.unique' => 'La cédula ya está registrada en el sistema.',
         ]);
 
@@ -71,7 +70,7 @@ class AdminProfileController extends Controller
                 'email' => $request->email,
             ];
 
-            if (empty($user->cedula)) {
+            if (empty($user->cedula) && $request->filled('cedula')) {
                 $updateData['cedula'] = $request->cedula;
             }
 

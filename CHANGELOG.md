@@ -40,6 +40,8 @@ Todas las modificaciones del repositorio se registran bajo el estándar estricto
   * Reconstrucción del archivo borrado de documentación principal.
 
 ### ⚙️ Refactorizaciones y Rebranding (Refactor)
+* `refactor: hacer opcional el campo de cédula en el perfil de estudiantes y administradores (Tarea #32)`
+  * La cédula ya no es obligatoria al actualizar perfiles de usuario si no se ha registrado previamente.
 * `refactor: implementar accesores y métodos de utilidad en modelo User y Blade (Tarea #25)`
   * Centralización del algoritmo de rango militar (`$user->rank`) y saneamiento en vistas.
 * `rebrand: renombrar la aplicación a Tactic Force en todo el sistema (Tarea #15)`

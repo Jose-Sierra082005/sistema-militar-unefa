@@ -312,14 +312,13 @@ class AuthController extends Controller
         $rules = [];
         $messages = [];
 
-        // If cedula is not set yet, require it
-        if (empty($user->cedula)) {
+        // If cedula is not set yet, validate only if filled
+        if (empty($user->cedula) && $request->filled('cedula')) {
             $cedula = strip_tags(trim($request->cedula));
             $cleanCedula = User::normalizeCedula($cedula);
             $request->merge(['cedula' => $cleanCedula]);
 
-            $rules['cedula'] = 'required|string|unique:users,cedula,'.$user->id;
-            $messages['cedula.required'] = 'La Cédula de Identidad es obligatoria.';
+            $rules['cedula'] = 'nullable|string|unique:users,cedula,'.$user->id;
             $messages['cedula.unique'] = 'Esta Cédula ya está registrada en el sistema.';
         }
 
@@ -340,7 +339,7 @@ class AuthController extends Controller
         $request->validate($rules, $messages);
 
         $updateData = [];
-        if (empty($user->cedula)) {
+        if (empty($user->cedula) && $request->filled('cedula')) {
             $updateData['cedula'] = $request->cedula;
         }
         if ($request->filled('password')) {
