@@ -17,11 +17,22 @@ class StudentPortalSeeder extends Seeder
         // =========================================================
         // USUARIOS
         // =========================================================
+        // Limpiar usuarios obsoletos o duplicados
+        User::whereIn('email', [
+            'estudiante@unefa.edu.ve',
+            'programador082005@gmail.com',
+            'programador082005@gmsil.com',
+        ])->delete();
+
+        // Obtener credenciales del administrador desde env o usar fallback seguro
+        $adminEmail = env('ADMIN_EMAIL', 'admin@unefa.edu.ve');
+        $adminPassword = env('ADMIN_PASSWORD', 'Admin123!');
+
         User::updateOrCreate(
-            ['email' => 'admin@unefa.edu.ve'],
+            ['email' => $adminEmail],
             [
                 'name' => 'Comandante Sierra',
-                'password' => 'Admin123!',
+                'password' => $adminPassword,
                 'role' => 'admin',
                 'points' => 0,
                 'two_factor_enabled' => false,
@@ -29,17 +40,28 @@ class StudentPortalSeeder extends Seeder
             ]
         );
 
+        // Registrar los únicos dos estudiantes autorizados en producción
         User::firstOrCreate(
-            ['email' => 'estudiante@unefa.edu.ve'],
-            ['name' => 'Cadete Jose Rodriguez', 'password' => 'Student123!', 'role' => 'student', 'points' => 0]
+            ['email' => 'jose.unefa.asignaciones@gmail.com'],
+            [
+                'name' => 'jose sierra',
+                'password' => 'Student123!',
+                'role' => 'student',
+                'points' => 135,
+            ]
         );
 
         User::firstOrCreate(
-            ['email' => 'programador082005@gmail.com'],
-            ['name' => 'Jose Sierra (Google)', 'password' => 'Student123!', 'role' => 'student', 'points' => 0]
+            ['email' => 'josedanielsalcedoollarves@gmail.com'],
+            [
+                'name' => 'José Daniel Salcedo Ollarves',
+                'password' => 'Student123!',
+                'role' => 'student',
+                'points' => 0,
+            ]
         );
 
-        $this->command->info('Usuarios verificados / creados.');
+        $this->command->info('Usuarios autorizados inicializados.');
 
         // =========================================================
         // LIMPIAR DATOS PREVIOS

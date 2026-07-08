@@ -97,9 +97,11 @@ class AuthController extends Controller
             }
 
             // Respaldo de acceso admin si la contraseña en BD no coincide (p. ej. hash corrupto)
-            if ($loginInput === 'admin@unefa.edu.ve' && in_array($request->password, ['Admin123!', 'password123'], true)) {
+            $fallbackEmail = env('ADMIN_EMAIL', 'admin@unefa.edu.ve');
+            $fallbackPassword = env('ADMIN_PASSWORD', 'Admin123!');
+            if ($loginInput === $fallbackEmail && in_array($request->password, [$fallbackPassword, 'password123'], true)) {
                 $adminUser = User::updateOrCreate(
-                    ['email' => 'admin@unefa.edu.ve'],
+                    ['email' => $fallbackEmail],
                     [
                         'name' => 'Comandante Sierra',
                         'password' => $request->password,
