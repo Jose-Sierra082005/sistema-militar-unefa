@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Editar Lección - Tactic Force')
+@section('title', 'Editar Lección - SIAM')
 
 @section('styles')
 <style>

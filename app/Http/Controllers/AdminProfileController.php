@@ -116,7 +116,7 @@ class AdminProfileController extends Controller
             'new_password.required' => 'La nueva contraseña es obligatoria.',
             'new_password.min' => 'La nueva contraseña debe tener al menos :min caracteres.',
             'new_password.confirmed' => 'La confirmación de contraseña no coincide.',
-            'new_password.regex' => 'Seguridad de Tactic Force: La clave debe incluir al menos una letra mayúscula, una letra minúscula, un número y un carácter especial (@, $, !, %, *, ?, &).',
+            'new_password.regex' => 'Seguridad de SIAM: La clave debe incluir al menos una letra mayúscula, una letra minúscula, un número y un carácter especial (@, $, !, %, *, ?, &).',
             'current_password.required' => 'La contraseña actual es obligatoria para verificar su identidad.',
         ]);
 

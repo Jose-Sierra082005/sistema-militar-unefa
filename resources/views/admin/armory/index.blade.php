@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Manual de Armamento y Estudio Táctico - Tactic Force')
+@section('title', 'Manual de Armamento y Estudio Táctico - SIAM')
 
 @section('content')
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">

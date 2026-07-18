@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ !empty($adminPortal) ? 'Acceso Administrador' : 'Acceso Seguro' }} - Tactic Force</title>
+    <title>{{ !empty($adminPortal) ? 'Acceso Administrador' : 'Acceso Seguro' }} - SIAM</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -519,7 +519,7 @@
             <div class="logo-container">
                 <i class="fa-solid fa-{{ !empty($adminPortal) ? 'gauge-high' : 'shield-halved' }}"></i>
             </div>
-            <h2 class="title">Tactic Force</h2>
+            <h2 class="title">SIAM</h2>
             @if(!empty($adminPortal))
                 <p class="subtitle">Panel de Administración Académica<br>Gestión de cursos, lecciones y evaluaciones</p>
             @else
@@ -576,7 +576,7 @@
             </div>
 
             <button type="submit" class="btn-submit">
-                {{ !empty($adminPortal) ? 'Ingresar como Administrador' : 'Ingresar a Tactic Force' }}
+                {{ !empty($adminPortal) ? 'Ingresar como Administrador' : 'Ingresar a SIAM' }}
             </button>
         </form>
 
@@ -610,7 +610,7 @@
         @endif
 
         <div class="footer">
-            <p>&copy; 2026 Tactic Force. Todos los derechos reservados.</p>
+            <p>&copy; 2026 SIAM. Todos los derechos reservados.</p>
             <p>Soporte Técnico: <a href="mailto:soporte@unefafalcon.edu.ve">soporte@unefafalcon.edu.ve</a></p>
         </div>
     </div>

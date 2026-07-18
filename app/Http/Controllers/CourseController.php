@@ -12,7 +12,7 @@ use Illuminate\View\View;
 /**
  * Class CourseController
  * Administra el catálogo de cursos, lecciones y banco de preguntas de la
- * plataforma Tactic Force en el Panel de Administrador (CMS).
+ * plataforma SIAM en el Panel de Administrador (CMS).
  */
 class CourseController extends Controller
 {

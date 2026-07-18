@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Panel de Control - Tactic Force')
+@section('title', 'Panel de Control - SIAM')
 
 @section('styles')
     <style>
@@ -548,7 +548,7 @@
                 <div class="panel-header-bar">
                     <div class="panel-title">
                         <i class="fa-solid fa-list-check"></i>
-                        <span>Bitácora de Tactic Force</span>
+                        <span>Bitácora de SIAM</span>
                     </div>
                 </div>
                 <div class="panel-body" style="max-height: 250px; overflow-y: auto;">
@@ -561,7 +561,7 @@
                         <li class="activity-item">
                             <div class="activity-time">{{ now()->subMinutes(2)->format('H:i:s') }}</div>
                             <div class="activity-icon"><i class="fa-solid fa-circle-check"></i></div>
-                            <div class="activity-text">Sistema <strong>Tactic Force</strong> operacional.</div>
+                            <div class="activity-text">Sistema <strong>SIAM</strong> operacional.</div>
                         </li>
                         <li class="activity-item">
                             <div class="activity-time">{{ now()->subMinutes(15)->format('H:i:s') }}</div>

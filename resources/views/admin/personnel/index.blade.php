@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Fichero Académico - Tactic Force')
+@section('title', 'Fichero Académico - SIAM')
 
 @section('content')
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">

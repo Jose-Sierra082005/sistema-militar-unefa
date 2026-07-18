@@ -22,7 +22,7 @@ class Google2FAService
     /**
      * Generates the otpauth:// URI to scan with Authenticator apps.
      */
-    public static function getQRCodeUrl($name, $email, $secret, $issuer = 'Tactic Force')
+    public static function getQRCodeUrl($name, $email, $secret, $issuer = 'SIAM')
     {
         return sprintf(
             'otpauth://totp/%s:%s?secret=%s&issuer=%s',
@@ -36,7 +36,7 @@ class Google2FAService
     /**
      * URL de imagen QR lista para usar (un solo nivel de codificación).
      */
-    public static function getQRCodeImageUrl($name, $email, $secret, $issuer = 'Tactic Force', int $size = 200): string
+    public static function getQRCodeImageUrl($name, $email, $secret, $issuer = 'SIAM', int $size = 200): string
     {
         $otpauth = self::getQRCodeUrl($name, $email, $secret, $issuer);
 

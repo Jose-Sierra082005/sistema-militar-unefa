@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', $lesson->title . ' - Tactic Force')
+@section('title', $lesson->title . ' - SIAM')
 
 @section('styles')
     <style>

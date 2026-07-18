@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Tactic Force')</title>
+    <title>@yield('title', 'SIAM')</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -715,7 +715,7 @@
     <aside id="sidebar">
         <div class="sidebar-brand">
             <i class="fa-solid fa-shield-halved"></i>
-            <span class="sidebar-brand-text">TACTIC FORCE</span>
+            <span class="sidebar-brand-text">SIAM</span>
             <button class="sidebar-close-btn" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <ul class="sidebar-menu">
@@ -791,7 +791,7 @@
 
         </ul>
         <div class="sidebar-footer">
-            <div>TACTIC FORCE v2.1</div>
+            <div>SIAM v2.1</div>
             <div style="font-size: 0.7rem; color: var(--accent-gold); margin-top: 4px;">CONEXIÓN SEGURA</div>
         </div>
     </aside>

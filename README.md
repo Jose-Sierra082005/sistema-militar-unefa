@@ -1,4 +1,4 @@
-# 🛡️ Tactic Force — Sistema Web de Formación en Conocimientos Militares
+# 🛡️ SIAM — Sistema Web de Formación en Conocimientos Militares
 
 <p align="center">
   <img src="https://img.shields.io/badge/Laravel-v11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
@@ -12,7 +12,7 @@
 
 ## 📝 Descripción del Proyecto
 
-**Tactic Force** es una plataforma educativa interactiva tipo LMS (Learning Management System) orientada a la formación cívico-militar de **estudiantes universitarios** en conocimientos militares y estrategias tácticas. La aplicación ofrece una experiencia gamificada de aprendizaje y un panel de gestión integral diseñado para instituciones de educación superior con componente militar.
+**SIAM** es una plataforma educativa interactiva tipo LMS (Learning Management System) orientada a la formación cívico-militar de **estudiantes universitarios** en conocimientos militares y estrategias tácticas. La aplicación ofrece una experiencia gamificada de aprendizaje y un panel de gestión integral diseñado para instituciones de educación superior con componente militar.
 
 El sistema se divide en dos grandes áreas funcionales:
 

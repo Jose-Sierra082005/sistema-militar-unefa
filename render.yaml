@@ -1,5 +1,5 @@
-﻿# ==============================================================================
-#  Render Blueprint — TACTIC FORCE
+# ==============================================================================
+#  Render Blueprint — SIAM
 #  Despliegue via contenedor Docker (PHP 8.4 + Apache + Laravel)
 # ==============================================================================
 
@@ -13,7 +13,7 @@ services:
     branch: main
     envVars:
       - key: APP_NAME
-        value: "Tactic Force"
+        value: "SIAM"
       - key: APP_ENV
         value: production
       - key: APP_DEBUG

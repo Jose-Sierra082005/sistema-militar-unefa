@@ -1,4 +1,4 @@
-# Bitácora de Cambios — Tactic Force (Conventional Commits)
+# Bitácora de Cambios — SIAM (Conventional Commits)
 
 Todas las modificaciones del repositorio se registran bajo el estándar estricto de **Conventional Commits** y vinculadas a su respectiva tarea del plan de desarrollo.
 

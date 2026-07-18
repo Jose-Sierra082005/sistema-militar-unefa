@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Progreso Estudiantil — Tactic Force')
+@section('title', 'Progreso Estudiantil — SIAM')
 
 @section('styles')
 <style>

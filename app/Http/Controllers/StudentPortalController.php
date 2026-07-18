@@ -271,7 +271,7 @@ class StudentPortalController extends Controller
             Log::info('[INFO] ['.now()->toDateString()."]: Generando material táctico de descarga para lección '{$lesson->title}' (ID: {$id}).");
 
             $content = "=================================================================\n";
-            $content .= "             TACTIC FORCE\n";
+            $content .= "                 SIAM\n";
             $content .= "             MANUAL DE ESTUDIO TACTICO ACADEMICO\n";
             $content .= "=================================================================\n\n";
             $content .= 'CURSO: '.mb_strtoupper($lesson->course->title)."\n";

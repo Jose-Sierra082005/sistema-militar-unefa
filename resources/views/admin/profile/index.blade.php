@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Configuración Perfil | Tactic Force')
+@section('title', 'Configuración Perfil | SIAM')
 
 @section('styles')
 <style>

@@ -94,12 +94,12 @@ class EmailService
         <body>
             <div class="container">
                 <div class="header">
-                    <div class="title">TACTIC FORCE</div>
+                    <div class="title">SIAM</div>
                     <div class="subtitle">CONFIDENCIALIDAD Y SEGURIDAD NACIONAL</div>
                 </div>
                 <div class="content">
                     <p>Estimado Oficial <strong>'.htmlspecialchars($name).'</strong>,</p>
-                    <p>Se ha iniciado una solicitud de recuperación de contraseña de acceso para su cuenta registrada en la plataforma Tactic Force.</p>
+                    <p>Se ha iniciado una solicitud de recuperación de contraseña de acceso para su cuenta registrada en la plataforma SIAM.</p>
                     <p>Para autorizar esta acción y establecer una nueva clave, ingrese el siguiente código único de seguridad en la pantalla de verificación del sistema:</p>
                     
                     <div class="otp-box">'.htmlspecialchars($otp).'</div>
@@ -111,7 +111,7 @@ class EmailService
                     </div>
                 </div>
                 <div class="footer">
-                    <p>&copy; 2026 Tactic Force. Todos los derechos reservados.</p>
+                    <p>&copy; 2026 SIAM. Todos los derechos reservados.</p>
                     <p>Soporte de Seguridad Informática - UNEFA Falcón</p>
                 </div>
             </div>
@@ -124,7 +124,7 @@ class EmailService
                     'Content-Type' => 'application/json',
                 ])
                 ->post('https://api.resend.com/emails', [
-                    'from' => 'Tactic Force <onboarding@resend.dev>',
+                    'from' => 'SIAM <onboarding@resend.dev>',
                     'to' => [$email],
                     'subject' => '🛡️ Código de Seguridad - Recuperación de Contraseña',
                     'html' => $htmlContent,

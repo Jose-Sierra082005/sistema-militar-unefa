@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuración de Doble Factor - Tactic Force</title>
+    <title>Configuración de Doble Factor - SIAM</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -375,7 +375,7 @@
                 <label class="form-label">Código de Verificación de 6 Dígitos</label>
                 <input type="text" name="code" class="form-input-code" placeholder="000000" maxlength="6" minlength="6" inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code" required value="{{ old('code') }}">
                 <p style="font-size: 0.72rem; color: var(--text-secondary); text-align: center; margin-top: 8px;">
-                    Abra Google Authenticator y copie los <strong>6 números</strong> que aparecen para Tactic Force.
+                    Abra Google Authenticator y copie los <strong>6 números</strong> que aparecen para SIAM.
                 </p>
             </div>
 

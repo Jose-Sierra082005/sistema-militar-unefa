@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Mi Perfil | Tactic Force')
+@section('title', 'Mi Perfil | SIAM')
 
 @section('styles')
 <style>
@@ -451,7 +451,7 @@
                                 <div style="font-weight:700;color:var(--success-green);margin-bottom:4px;">Doble Factor Activo y Protegido</div>
                                 <div style="font-size:.81rem;color:var(--text-secondary);line-height:1.5;">
                                     Su cuenta requiere el c&oacute;digo de Google Authenticator en cada inicio de sesi&oacute;n.
-                                    Abra la app, busque <strong style="color:var(--accent-gold);">Tactic Force</strong> e ingrese el c&oacute;digo de 6 d&iacute;gitos cuando se le solicite.
+                                    Abra la app, busque <strong style="color:var(--accent-gold);">SIAM</strong> e ingrese el c&oacute;digo de 6 d&iacute;gitos cuando se le solicite.
                                 </div>
                             </div>
                         </div>

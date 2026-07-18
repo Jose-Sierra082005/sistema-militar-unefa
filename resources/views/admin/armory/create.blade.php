@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Registrar Armamento - Tactic Force')
+@section('title', 'Registrar Armamento - SIAM')
 
 @section('content')
     <div style="margin-bottom: 20px;">

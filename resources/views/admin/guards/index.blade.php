@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Procedimientos y Turnos de Guardia - Tactic Force')
+@section('title', 'Procedimientos y Turnos de Guardia - SIAM')
 
 @section('content')
     <div style="margin-bottom: 20px;">
