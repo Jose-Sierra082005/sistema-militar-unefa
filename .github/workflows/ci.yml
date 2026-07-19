@@ -16,6 +16,7 @@ on:
       - develop
   push:
     branches:
+      - main
       - develop
 
 jobs:
@@ -79,3 +80,40 @@ jobs:
       - name: "🎨 Verificar estilo de código (Laravel Pint — Linter)"
         run: ./vendor/bin/pint --test
         continue-on-error: true
+
+  docker-build-verification:
+    name: 🐳 Construcción y Verificación de Imagen Docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: "📥 Paso 1 — Descargar código fuente"
+        uses: actions/checkout@v4
+
+      - name: "🛠️ Paso 2 — Configurar Docker Buildx"
+        uses: docker/setup-buildx-action@v3
+
+      - name: "📦 Paso 3 — Probar compilación de la Imagen Docker (Artefacto Inmutable)"
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: sistema-militar:latest
+
+  deploy-production:
+    name: 🚀 Despliegue Continuo (CD) a Render
+    needs: [laravel-tests, docker-build-verification]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: "🌐 Disparar Webhook de Despliegue en Render"
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "⚠️ ERROR: El secreto RENDER_DEPLOY_HOOK_URL no está configurado en GitHub Secrets."
+            exit 1
+          fi
+          echo "Disparando despliegue de forma desatendida en Render..."
+          curl -f -X POST "$RENDER_DEPLOY_HOOK"
+          echo "✅ Petición de despliegue enviada con éxito."
+

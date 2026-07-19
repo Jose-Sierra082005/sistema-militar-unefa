@@ -14,7 +14,60 @@ use App\Http\Controllers\WeaponController;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\User;
-use Illuminate\Support\Facades\Route;
+// Ruta de verificación de salud (Health Check) para auto-recuperación (Self-Healing)
+Route::get('/health', function () {
+    $status = 'OK';
+    $details = [];
+
+    // 1. Verificar conexión a la Base de Datos
+    try {
+        \Illuminate\Support\Facades\DB::connection()->getPdo();
+        $details['database'] = [
+            'status' => 'UP',
+            'driver' => \Illuminate\Support\Facades\DB::connection()->getDriverName(),
+        ];
+    } catch (\Exception $e) {
+        $status = 'ERROR';
+        $details['database'] = [
+            'status' => 'DOWN',
+            'message' => $e->getMessage(),
+        ];
+        \Illuminate\Support\Facades\Log::error('Health Check - Database down: ' . $e->getMessage());
+    }
+
+    // 2. Verificar que storage sea escribible
+    $storagePath = storage_path();
+    if (is_writable($storagePath)) {
+        $details['storage'] = [
+            'status' => 'UP',
+            'writable' => true,
+        ];
+    } else {
+        $status = 'ERROR';
+        $details['storage'] = [
+            'status' => 'DOWN',
+            'writable' => false,
+            'message' => 'Storage directory is not writable',
+        ];
+        \Illuminate\Support\Facades\Log::error('Health Check - Storage not writable');
+    }
+
+    // 3. Detalles del Servidor
+    $details['server'] = [
+        'php_version' => PHP_VERSION,
+        'environment' => app()->environment(),
+        'timezone' => config('app.timezone'),
+        'timestamp' => now()->toIso8601String(),
+    ];
+
+    $responseCode = ($status === 'OK') ? 200 : 500;
+
+    return response()->json([
+        'status' => $status,
+        'timestamp' => now()->toIso8601String(),
+        'services' => $details,
+    ], $responseCode);
+});
 
 Route::get('/', function () {
     if (auth()->check() && auth()->user()->role === 'admin') {

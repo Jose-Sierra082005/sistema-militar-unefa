@@ -8,6 +8,7 @@ services:
     name: sistema-militar-unefa
     env: docker
     plan: free
+    healthCheckPath: /health
     # Render construye la imagen desde el Dockerfile en la raíz del repositorio
     dockerfilePath: ./Dockerfile
     branch: main
