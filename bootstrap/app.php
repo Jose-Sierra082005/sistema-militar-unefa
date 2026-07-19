@@ -42,6 +42,19 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
+            // ─── Evitar interceptar excepciones del framework que manejan flujo ───
+            // No debemos capturar excepciones de autenticación (redirigen a login)
+            // ni excepciones de validación (redirigen atrás con errores de formulario).
+            if ($e instanceof \Illuminate\Auth\AuthenticationException || 
+                $e instanceof \Illuminate\Validation\ValidationException) {
+                return null;
+            }
+
+            // Solo para errores 500+ (no sobreescribir 403, 404 ni otras HttpExceptions)
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+                return null;
+            }
+
             // Recuperar el Correlation ID asignado por el middleware
             $correlationId = app()->has('correlation_id')
                 ? app('correlation_id')
@@ -68,17 +81,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 500);
             }
 
-            // ─── Respuesta para peticiones Web: vista segura ───────────────
-            // Solo para errores 500+ (no sobreescribir 404, 403, etc.)
-            if (! ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException)) {
-                return response()->view('errors.500', [
-                    'correlationId' => $correlationId,
-                ], 500);
-            }
-
-            // Para HttpExceptions (403, 404, etc.), dejar que Laravel
-            // use las vistas errors/403.blade.php, errors/404.blade.php, etc.
-            return null;
+            // ─── Respuesta para peticiones Web: vista segura (500) ──────────
+            return response()->view('errors.500', [
+                'correlationId' => $correlationId,
+            ], 500);
         });
 
         // Renderizar JSON solo cuando la petición espera JSON en rutas API
