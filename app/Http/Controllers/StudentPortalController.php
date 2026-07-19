@@ -213,9 +213,20 @@ class StudentPortalController extends Controller
     public function showCourse($id)
     {
         $user = Auth::user();
+
+        // ─── BlueTeam: Autorización explícita ─────────────────────────────
+        // Los cursos son accesibles a todos los estudiantes autenticados.
+        // La autenticación y el rol 'student' ya fueron verificados por el middleware.
+        // Registramos el acceso para trazabilidad.
         $course = Course::with(['lessons' => function ($q) {
             $q->orderBy('order', 'asc')->orderBy('id', 'asc');
         }])->findOrFail($id);
+
+        Log::info('Estudiante accedió a un curso.', [
+            'action'    => 'student.course.view',
+            'course_id' => $course->id,
+            'user_id'   => $user->id,
+        ]);
 
         $completedLessonIds = LessonCompletion::where('user_id', $user->id)
             ->pluck('lesson_id')->toArray();
@@ -255,9 +266,23 @@ class StudentPortalController extends Controller
         }
 
         if (! $unlocked) {
+            // ─── BlueTeam: Bloqueo de acceso secuencial ───────────────────
+            // El sistema verifica explícitamente la condición de desbloqueo.
+            Log::warning('Intento de acceso a lección bloqueada.', [
+                'action'    => 'student.lesson.blocked',
+                'lesson_id' => $lesson->id,
+                'user_id'   => $user->id,
+            ]);
+
             return redirect()->route('student.courses.show', $lesson->course_id)
                 ->with('error', 'Esta leccion esta bloqueada. Complete las anteriores primero.');
         }
+
+        Log::info('Estudiante accedió a una lección.', [
+            'action'    => 'student.lesson.view',
+            'lesson_id' => $lesson->id,
+            'user_id'   => $user->id,
+        ]);
 
         $isCompleted = in_array($lesson->id, $completedLessonIds);
 

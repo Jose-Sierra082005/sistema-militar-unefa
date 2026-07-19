@@ -1,5 +1,6 @@
 <?php
 
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -52,9 +53,13 @@ return [
 
     'channels' => [
 
+        // Stack principal: escribe en el canal configurado + siempre en JSON estructurado
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            'channels' => array_unique(array_merge(
+                explode(',', (string) env('LOG_STACK', 'single')),
+                ['siam_json']
+            )),
             'ignore_exceptions' => false,
         ],
 
@@ -103,6 +108,26 @@ return [
             ],
             'formatter' => env('LOG_STDERR_FORMATTER'),
             'processors' => [PsrLogMessageProcessor::class],
+        ],
+
+        // ─────────────────────────────────────────────────────────────
+        // SIAM — Canal de Log JSON Estructurado (Avance #6)
+        // Genera logs legibles por máquinas con Correlation ID incluido.
+        // Formato: {"datetime":"...","level":"error","message":"...","correlation_id":"..."}
+        // ─────────────────────────────────────────────────────────────
+        'siam_json' => [
+            'driver'         => 'monolog',
+            'level'          => env('LOG_LEVEL', 'debug'),
+            'handler'        => StreamHandler::class,
+            'handler_with'   => [
+                'stream' => storage_path('logs/siam.json.log'),
+            ],
+            'formatter'      => Monolog\Formatter\JsonFormatter::class,
+            'formatter_with' => [
+                'batchMode'        => Monolog\Formatter\JsonFormatter::BATCH_MODE_NEWLINES,
+                'appendNewline'    => true,
+            ],
+            'processors'     => [PsrLogMessageProcessor::class],
         ],
 
         'syslog' => [

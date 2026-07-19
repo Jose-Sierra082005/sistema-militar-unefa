@@ -7,15 +7,21 @@ use App\Models\Lesson;
 use App\Models\Option;
 use App\Models\Question;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 /**
  * Class CourseController
  * Administra el catálogo de cursos, lecciones y banco de preguntas de la
  * plataforma SIAM en el Panel de Administrador (CMS).
+ *
+ * BlueTeam (Avance #6): validaciones estrictas de enumerados, longitudes
+ * máximas y sanitización de contenido HTML enriquecido.
  */
 class CourseController extends Controller
 {
+    // Niveles de dificultad permitidos
+    private const ALLOWED_DIFFICULTIES = ['Básico', 'Intermedio', 'Avanzado'];
     /**
      * Muestra la lista paginada de cursos registrados en el sistema,
      * permitiendo búsquedas filtradas por título, categoría o dificultad.
@@ -47,11 +53,21 @@ class CourseController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'title'    => strip_tags(trim($request->title ?? '')),
+            'category' => strip_tags(trim($request->category ?? '')),
+        ]);
+
+        $allowedCategories = config('course_categories', []);
+
         $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category' => 'required|string|max:255',
-            'difficulty' => 'required|string|max:255',
+            'title'      => 'required|string|min:5|max:200',
+            'description'=> 'required|string',
+            'category'   => 'required|string|max:100',
+            'difficulty' => 'required|string|in:'.implode(',', self::ALLOWED_DIFFICULTIES),
+        ], [
+            'title.min'       => 'El título debe tener al menos 5 caracteres.',
+            'difficulty.in'   => 'El nivel de dificultad seleccionado no es válido.',
         ]);
 
         $description = $this->sanitizeRichText($request->description);
@@ -60,11 +76,18 @@ class CourseController extends Controller
             return back()->withErrors(['description' => 'La descripción del curso es obligatoria.'])->withInput();
         }
 
-        Course::create([
-            'title' => $request->title,
+        $course = Course::create([
+            'title'       => $request->title,
             'description' => $description,
-            'category' => $request->category,
-            'difficulty' => $request->difficulty,
+            'category'    => $request->category,
+            'difficulty'  => $request->difficulty,
+        ]);
+
+        Log::info('Curso académico registrado.', [
+            'action'    => 'course.store',
+            'course_id' => $course->id,
+            'title'     => $course->title,
+            'admin_id'  => auth()->id(),
         ]);
 
         return redirect()->route('admin.courses.index')->with('success', 'Curso académico militar registrado con éxito.');
@@ -90,11 +113,18 @@ class CourseController extends Controller
     {
         $course = Course::findOrFail($id);
 
+        $request->merge([
+            'title'    => strip_tags(trim($request->title ?? '')),
+            'category' => strip_tags(trim($request->category ?? '')),
+        ]);
+
         $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category' => 'required|string|max:255',
-            'difficulty' => 'required|string|max:255',
+            'title'      => 'required|string|min:5|max:200',
+            'description'=> 'required|string',
+            'category'   => 'required|string|max:100',
+            'difficulty' => 'required|string|in:'.implode(',', self::ALLOWED_DIFFICULTIES),
+        ], [
+            'difficulty.in' => 'El nivel de dificultad seleccionado no es válido.',
         ]);
 
         $description = $this->sanitizeRichText($request->description);
@@ -104,10 +134,16 @@ class CourseController extends Controller
         }
 
         $course->update([
-            'title' => $request->title,
+            'title'       => $request->title,
             'description' => $description,
-            'category' => $request->category,
-            'difficulty' => $request->difficulty,
+            'category'    => $request->category,
+            'difficulty'  => $request->difficulty,
+        ]);
+
+        Log::info('Curso académico actualizado.', [
+            'action'    => 'course.update',
+            'course_id' => $course->id,
+            'admin_id'  => auth()->id(),
         ]);
 
         return redirect()->route('admin.courses.index')->with('success', 'Curso académico actualizado con éxito.');
