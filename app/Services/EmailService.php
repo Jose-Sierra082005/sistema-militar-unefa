@@ -135,44 +135,70 @@ class EmailService
                 Log::info("OTP reset email sent successfully to {$email}");
 
                 return true;
-            } else {
-                Log::error("Failed to send OTP email via Resend to {$email}. Error: ".$response->body());
+            }
 
-                // ─── SIAM — FALLBACK DE CONTINGENCIA (Avance #6) ──────────────────
-                // Si la entrega del correo falla por API Key inválida o dominio no verificado,
-                // registramos de forma visible el código OTP en los logs estructurados del servidor.
-                // Esto permite al profesor, evaluador o administrador (L1/L2) recuperar
-                // el código directamente del panel de Render o de 'storage/logs/siam.json.log'
-                // y continuar con la verificación táctica.
-                Log::warning("CONTINGENCIA (Servicio de Correo Caído): Código OTP para {$email} registrado en logs: [{$otp}]", [
-                    'action' => 'email.fallback_otp',
-                    'email' => $email,
-                    'otp' => $otp,
+            // ─── Manejo de restricción Sandbox de Resend (HTTP 403) ──────────────
+            // El plan gratuito de Resend sin dominio verificado solo permite enviar
+            // correos a la dirección del dueño de la cuenta (RESEND_AUTHORIZED_EMAIL).
+            // Si el destinatario original es rechazado, reintentamos automáticamente
+            // al buzón autorizado para que el código llegue de forma real al correo.
+            if ($response->status() === 403) {
+                $authorizedEmail = config('services.resend.authorized_email',
+                    env('RESEND_AUTHORIZED_EMAIL', 'jose.unefa.asignaciones@gmail.com'));
+
+                Log::warning("Resend sandbox restriction: retrying OTP delivery to authorized mailbox [{$authorizedEmail}] on behalf of [{$email}]", [
+                    'action'             => 'email.sandbox_retry',
+                    'original_recipient' => $email,
+                    'retry_recipient'    => $authorizedEmail,
+                    'otp'                => $otp,
                 ]);
 
-                if (env('EMAIL_FALLBACK_ENABLED', true)) {
-                    // Permitir el paso para no bloquear el flujo académico del sistema
-                    session()->flash('warning', 'El servicio de correo se encuentra en modo contingencia. El código de verificación ha sido registrado en los logs del servidor.');
+                // Reenviar al buzón autorizado indicando para quién es el código
+                $retryResponse = Http::withToken($apiKey)
+                    ->withHeaders(['Content-Type' => 'application/json'])
+                    ->post('https://api.resend.com/emails', [
+                        'from'    => 'SIAM <onboarding@resend.dev>',
+                        'to'      => [$authorizedEmail],
+                        'subject' => "🛡️ OTP para [{$email}] — Recuperación de Contraseña",
+                        'html'    => $htmlContent,
+                    ]);
+
+                if ($retryResponse->successful()) {
+                    Log::info("OTP sandbox retry delivered to [{$authorizedEmail}] on behalf of [{$email}]");
+                    // Notificar al usuario dónde revisar el correo
+                    session()->flash('warning',
+                        "Modo prueba activo: El código OTP fue enviado al buzón de administración del sistema ({$authorizedEmail}). Revise esa bandeja de entrada para obtener su código.");
+
                     return true;
                 }
-
-                return false;
             }
-        } catch (\Exception $e) {
-            Log::error('Exception occurred while sending OTP email: '.$e->getMessage());
 
-            Log::warning("CONTINGENCIA (Excepción de Correo): Código OTP para {$email} registrado en logs: [{$otp}]", [
-                'action' => 'email.fallback_otp_exception',
-                'email' => $email,
-                'otp' => $otp,
+            // ─── FALLBACK FINAL — Log del OTP si todo falla ────────────────────
+            Log::error("Failed to send OTP email via Resend to {$email}. Error: ".$response->body());
+            Log::warning("CONTINGENCIA (Correo Caído): OTP para {$email} en logs: [{$otp}]", [
+                'action' => 'email.fallback_otp',
+                'email'  => $email,
+                'otp'    => $otp,
             ]);
 
-            if (env('EMAIL_FALLBACK_ENABLED', true)) {
-                session()->flash('warning', 'El servicio de correo se encuentra en modo contingencia. El código de verificación ha sido registrado en los logs del servidor.');
-                return true;
-            }
+            session()->flash('warning',
+                'El servicio de correo se encuentra en modo contingencia. El código de verificación ha sido registrado en los logs del servidor.');
 
-            return false;
+            return true;
+
+        } catch (\Exception $e) {
+            Log::error('Exception occurred while sending OTP email: '.$e->getMessage());
+            Log::warning("CONTINGENCIA (Excepción): OTP para {$email} en logs: [{$otp}]", [
+                'action' => 'email.fallback_otp_exception',
+                'email'  => $email,
+                'otp'    => $otp,
+            ]);
+
+            session()->flash('warning',
+                'El servicio de correo se encuentra en modo contingencia. El código de verificación ha sido registrado en los logs del servidor.');
+
+            return true;
         }
     }
 }
+
