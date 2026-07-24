@@ -714,8 +714,7 @@
     <!-- Mobile Drawer Overlay -->
     <aside id="sidebar">
         <div class="sidebar-brand">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span class="sidebar-brand-text">SIAM</span>
+            <img src="/images/logo.png" alt="SIAM" style="height:48px; width:auto; object-fit:contain; filter: drop-shadow(0 0 6px rgba(212,175,55,0.35));">
             <button class="sidebar-close-btn" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <ul class="sidebar-menu">

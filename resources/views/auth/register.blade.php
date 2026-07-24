@@ -389,7 +389,7 @@
             <div class="form-group">
                 <label class="form-label">Correo Electrónico</label>
                 <div class="input-wrapper">
-                    <input type="email" name="email" class="form-input" placeholder="ej. oficial@unefa.edu.ve" value="{{ old('email') }}" required>
+                    <input type="email" name="email" class="form-input" placeholder="ej. su correo electrónico" value="{{ old('email') }}" required>
                     <i class="fa-solid fa-envelope input-icon"></i>
                 </div>
             </div>

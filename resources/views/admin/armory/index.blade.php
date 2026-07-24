@@ -9,7 +9,7 @@
                 Manual de Armamento y Estudio Táctico
             </h2>
             <p style="color: var(--text-secondary); font-size: 0.9rem;">
-                Biblioteca digital y catálogo técnico de armamento de estudio militar para alumnos de la UNEFA Falcón.
+                Biblioteca digital y catálogo técnico de armamento de estudio militar.
             </p>
         </div>
         <a href="{{ route('admin.armory.create') }}" class="btn-tactical">

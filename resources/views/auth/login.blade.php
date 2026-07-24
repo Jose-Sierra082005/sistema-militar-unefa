@@ -516,14 +516,13 @@
         </div>
 
         <div class="header">
-            <div class="logo-container">
-                <i class="fa-solid fa-{{ !empty($adminPortal) ? 'gauge-high' : 'shield-halved' }}"></i>
+            <div class="logo-container" style="background:none; border:none; box-shadow:none; padding:0;">
+                <img src="/images/logo.png" alt="SIAM" style="height:90px; width:auto; object-fit:contain; filter: drop-shadow(0 0 10px rgba(212,175,55,0.4));">
             </div>
-            <h2 class="title">SIAM</h2>
             @if(!empty($adminPortal))
                 <p class="subtitle">Panel de Administración Académica<br>Gestión de cursos, lecciones y evaluaciones</p>
             @else
-                <p class="subtitle">Portal de Formación y Evaluaciones Académicas <br> UNEFA Falcón</p>
+                <p class="subtitle">Sistema Interactivo de Aprendizaje Militar<br>Acceso Seguro al Portal Académico</p>
             @endif
         </div>
 
@@ -549,7 +548,7 @@
             <div class="form-group">
                 <label class="form-label">Cédula o Correo Electrónico</label>
                 <div class="input-wrapper">
-                    <input type="text" name="email" class="form-input" placeholder="ej. 31.149.881 o estudiante@unefa.ve" value="{{ old('email') }}" required>
+                    <input type="text" name="email" class="form-input" placeholder="ej. 31.149.881 o su correo electrónico" value="{{ old('email') }}" required>
                     <i class="fa-solid fa-user input-icon"></i>
                 </div>
             </div>
@@ -611,7 +610,7 @@
 
         <div class="footer">
             <p>&copy; 2026 SIAM. Todos los derechos reservados.</p>
-            <p>Soporte Técnico: <a href="mailto:soporte@unefafalcon.edu.ve">soporte@unefafalcon.edu.ve</a></p>
+            <p>Sistema Interactivo de Aprendizaje Militar</p>
         </div>
     </div>
 

@@ -367,7 +367,7 @@
             <div class="form-group">
                 <label class="form-label">Correo Electrónico de la Cuenta</label>
                 <div class="input-wrapper">
-                    <input type="email" name="email" class="form-input" placeholder="ej. estudiante@unefa.edu.ve" value="{{ old('email', $prefillEmail ?? '') }}" required autofocus>
+                    <input type="email" name="email" class="form-input" placeholder="ej. su correo electrónico" value="{{ old('email', $prefillEmail ?? '') }}" required autofocus>
                     <i class="fa-solid fa-envelope input-icon"></i>
                 </div>
             </div>

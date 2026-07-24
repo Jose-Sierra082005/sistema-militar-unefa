@@ -35,7 +35,7 @@
 
                 <div class="form-group">
                     <label class="form-label">Número de Serial / Registro</label>
-                    <input type="text" name="serial" class="form-input" placeholder="ej. UNEFA-AK103-99827" value="{{ old('serial') }}" required style="font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">
+                    <input type="text" name="serial" class="form-input" placeholder="ej. AK103-99827" value="{{ old('serial') }}" required style="font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">

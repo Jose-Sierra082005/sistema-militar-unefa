@@ -9,7 +9,7 @@
                 Cursos Académicos de Adiestramiento
             </h2>
             <p style="color: var(--text-secondary); font-size: 0.9rem;">
-                Administración y temarios de asignaturas táctico-militares para cadetes y estudiantes de la sede UNEFA Falcón.
+                Administración y temarios de asignaturas táctico-militares para cadetes y estudiantes.
             </p>
         </div>
         <a href="{{ route('admin.courses.create') }}" class="btn-tactical">

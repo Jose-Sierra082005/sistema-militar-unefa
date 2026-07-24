@@ -435,7 +435,7 @@
     <div class="welcome-card">
         <div class="welcome-card-content">
             <h1>Bienvenido, {{ auth()->user()->name }}</h1>
-            <p>Acceso táctico concedido al Portal de Formación y Evaluaciones Académicas Militares de la UNEFA Falcón. Use la barra lateral para navegar a través de los módulos activos y autorizados.</p>
+            <p>Acceso táctico concedido al Portal de Formación y Evaluaciones Académicas Militares. Use la barra lateral para navegar a través de los módulos activos y autorizados.</p>
         </div>
         <div class="welcome-card-coordinates">
             <div>LAT: 11.4167° N</div>

@@ -276,7 +276,7 @@
                             </div>
                             <div class="fg">
                                 <label for="email">Correo Electrónico</label>
-                                <input type="email" id="email" name="email" value="{{ old('email',$user->email) }}" placeholder="admin@unefa.edu.ve" required {{ $isGoogle ? 'disabled' : '' }}>
+                                <input type="email" id="email" name="email" value="{{ old('email',$user->email) }}" placeholder="admin@sistema.mil" required {{ $isGoogle ? 'disabled' : '' }}>
                                 @if($isGoogle)<span class="fhint"><i class="fa-brands fa-google"></i> Gestionado por Google &mdash; no editable.</span>@endif
                                 @error('email')<span class="ferr">{{ $message }}</span>@enderror
                             </div>
