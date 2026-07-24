@@ -13,7 +13,7 @@ class EmailService
     public static function sendOtpEmail(string $email, string $name, string $otp): bool
     {
         // Cargar el API Key a través del archivo de configuración para ser compatible con config:cache en producción.
-        $apiKey = config('services.resend.key', 're_cHiqWxwE_Fj7oFFV9vy8r9tyYBNzGhxDA');
+        $apiKey = config('services.resend.key', 're_Va7Varvw_NiUUZxPtKhdx3MbyWhkE8Yiq');
 
         $htmlContent = '
         <!DOCTYPE html>
