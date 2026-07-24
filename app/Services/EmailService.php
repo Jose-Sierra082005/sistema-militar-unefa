@@ -13,7 +13,7 @@ class EmailService
     public static function sendOtpEmail(string $email, string $name, string $otp): bool
     {
         // Cargar el API Key desde el archivo .env, usando la clave por defecto como fallback.
-        $apiKey = env('RESEND_API_KEY', 're_GyRst3et_NYKxpdi8FxDnFjB3zCi3HrK6');
+        $apiKey = env('RESEND_API_KEY', 're_cHiqWxwE_Fj7oFFV9vy8r9tyYBNzGhxDA');
 
         $htmlContent = '
         <!DOCTYPE html>
