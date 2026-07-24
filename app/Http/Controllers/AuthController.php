@@ -414,6 +414,10 @@ class AuthController extends Controller
         if ($emailSent) {
             session(['password.reset.email' => $request->email]);
 
+            if (session()->has('warning')) {
+                return redirect()->route('password.verify_otp');
+            }
+
             return redirect()->route('password.verify_otp')->with('success', 'Se ha enviado un código de seguridad OTP a su correo electrónico.');
         }
 
