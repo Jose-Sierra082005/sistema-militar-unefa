@@ -19,8 +19,8 @@ return [
     ],
 
     'resend' => [
-        'key'              => env('RESEND_API_KEY', 're_Va7Varvw_NiUUZxPtKhdx3MbyWhkE8Yiq'),
-        'authorized_email' => env('RESEND_AUTHORIZED_EMAIL', 'jose.unefa.asignaciones@gmail.com'),
+        'key'              => env('RESEND_API_KEY') ?: 're_Va7Varvw_NiUUZxPtKhdx3MbyWhkE8Yiq',
+        'authorized_email' => env('RESEND_AUTHORIZED_EMAIL') ?: 'jose.unefa.asignaciones@gmail.com',
     ],
 
     'ses' => [
