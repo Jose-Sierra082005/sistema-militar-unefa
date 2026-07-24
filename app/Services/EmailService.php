@@ -18,7 +18,7 @@ class EmailService
             $apiKey = env('RESEND_API_KEY');
         }
         if (empty($apiKey)) {
-            $apiKey = 're_Va7Varvw_NiUUZxPtKhdx3MbyWhkE8Yiq';
+            $apiKey = 're_Zzo586eW_8Z9FXjxpEEKWtPZyXH6vVZ1T';
         }
 
         $htmlContent = '
@@ -150,7 +150,7 @@ class EmailService
             // al buzón autorizado para que el código llegue de forma real al correo.
             if ($response->status() === 403) {
                 $authorizedEmail = config('services.resend.authorized_email',
-                    env('RESEND_AUTHORIZED_EMAIL', 'jose.unefa.asignaciones@gmail.com'));
+                    env('RESEND_AUTHORIZED_EMAIL', 'jfsmjosemarquez7@gmail.com'));
 
                 Log::warning("Resend sandbox restriction: retrying OTP delivery to authorized mailbox [{$authorizedEmail}] on behalf of [{$email}]", [
                     'action'             => 'email.sandbox_retry',
