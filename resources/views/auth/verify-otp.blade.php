@@ -224,6 +224,12 @@
             color: #9fedc0;
         }
 
+        .alert-warning {
+            background: rgba(230, 126, 34, 0.1);
+            border: 1px solid #e67e22;
+            color: #ffcc99;
+        }
+
         .forgot-link {
             color: var(--accent-gold);
             text-decoration: none;
@@ -282,6 +288,13 @@
             <h2 class="title">Verificación de Identidad</h2>
             <p class="subtitle">Introduzca los códigos correspondientes para continuar con la restauración de la clave militar.</p>
         </div>
+
+        @if (session('warning'))
+            <div class="alert alert-warning">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>{{ session('warning') }}</span>
+            </div>
+        @endif
 
         @if (session('success'))
             <div class="alert alert-success">
