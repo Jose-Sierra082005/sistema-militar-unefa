@@ -19,8 +19,8 @@ return [
     ],
 
     'resend' => [
-        'key'              => env('RESEND_API_KEY') ?: 're_Zzo586eW_8Z9FXjxpEEKWtPZyXH6vVZ1T',
-        'authorized_email' => env('RESEND_AUTHORIZED_EMAIL') ?: 'jfsmjosemarquez7@gmail.com',
+        'key'              => env('RESEND_API_KEY'),
+        'authorized_email' => env('RESEND_AUTHORIZED_EMAIL', 'jfsmjosemarquez7@gmail.com'),
     ],
 
     'ses' => [
